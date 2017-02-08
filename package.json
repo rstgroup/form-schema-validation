@@ -1,8 +1,8 @@
 {
   "name": "form-schema-validation",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Schema for form validation",
-  "main": "./libs/index.js",
+  "main": "lib/index.js",
   "jsnext:main": "src/index.js",
   "repository": "https://github.com/mprzodala/form-schema-validation",
   "homepage": "https://github.com/mprzodala/form-schema-validation",

@@ -3,7 +3,7 @@ var webpack = require('webpack');
 module.exports = {
     entry: "./src/index.js",
     output: {
-        path: './libs/',
+        path: './lib/',
         filename: "index.js",
         libraryTarget: "umd"
     },
