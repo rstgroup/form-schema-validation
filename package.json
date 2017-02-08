@@ -1,12 +1,16 @@
 {
   "name": "form-schema-validation",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Schema for form validation",
   "main": "./libs/index.js",
+  "jsnext:main": "src/index.js",
+  "repository": "https://github.com/mprzodala/form-schema-validation",
+  "homepage": "https://github.com/mprzodala/form-schema-validation",
+  "license": "MIT",
   "scripts": {
     "test": "jest",
     "build": "webpack -p --config webpack.config.js",
-    "prepublish": "npm run test build"
+    "prepublish": "npm run build"
   },
   "keywords": [
     "schema",
