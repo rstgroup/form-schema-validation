@@ -1,0 +1,49 @@
+{
+  "name": "form-schema-validation",
+  "version": "1.0.0",
+  "description": "Schema for form validation",
+  "main": "./libs/index.js",
+  "scripts": {
+    "test": "jest",
+    "build": "webpack -p --config webpack.config.js",
+    "prepublish": "npm run test build"
+  },
+  "keywords": [
+    "schema",
+    "forms",
+    "object",
+    "validation",
+    "validation-schema",
+    "schema-validation",
+    "js-schema",
+    "object-validation"
+  ],
+  "author": "Mariusz Przodała",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.17.3"
+  },
+  "devDependencies": {
+    "babel-core": "^6.21.0",
+    "babel-jest": "^18.0.0",
+    "babel-loader": "^6.2.10",
+    "babel-polyfill": "^6.20.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-es2015-native-modules": "^6.9.4",
+    "babel-preset-stage-0": "^6.16.0",
+    "jest": "^18.1.0",
+    "webpack": "^2.2.0"
+  },
+  "jest": {
+    "verbose": true,
+    "coverageThreshold": {
+      "global": {
+        "branches": 85,
+        "functions": 85,
+        "lines": 85,
+        "statements": 85
+      }
+    },
+    "collectCoverage": true
+  }
+}
