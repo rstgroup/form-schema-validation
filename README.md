@@ -68,4 +68,4 @@ When You defined schema You can use this keys:
 | defaultValue | Any | You can set default value for model |
 | options | Array of (String, Number, Object, Date, ...) | If you use schema for forms You can defined options for select field |
 | label | Any instance of String | If you use schema for forms You can defined label for form field |
-| validators | Function | You can add custom validators for validate field for example min or max length of value. |
+| validators | array of Functions | You can add custom validators for validate field for example min or max length of value. |
