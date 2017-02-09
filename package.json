@@ -1,6 +1,6 @@
 {
   "name": "form-schema-validation",
-  "version": "1.0.7",
+  "version": "1.0.9",
   "description": "Schema for form validation",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
