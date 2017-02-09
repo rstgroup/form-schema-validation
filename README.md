@@ -30,11 +30,19 @@ const error = Object.keys(errors).length > 0; // false
 If You want create new schema You must put object to constructor with information about object keys names and type of value on key.
 
 ```js
+const min = (minLength, message) => ({
+    validator: (value) => {
+        return value.length > minLength;
+    },
+    errorMessage: message
+});
+
 const schema = new Schema({
     companyName: {
         type: String,
         required: true,
         label: 'Company name'
+        validators: [min(2, 'Company name should be longer then 2 chars')]
     },
     createdAt: {
         type: Date
@@ -60,3 +68,4 @@ When You defined schema You can use this keys:
 | defaultValue | Any | You can set default value for model |
 | options | Array of (String, Number, Object, Date, ...) | If you use schema for forms You can defined options for select field |
 | label | Any instance of String | If you use schema for forms You can defined label for form field |
+| validators | Function | You can add custom validators for validate field for example min or max length of value. |
