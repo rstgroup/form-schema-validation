@@ -1,5 +1,10 @@
 # SCHEMA
 
+<img src="https://img.shields.io/badge/build-passing-brightgreen.svg" />
+<img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" />
+<img src="https://img.shields.io/badge/license-MIT25-blue.svg" />
+<img src="https://img.shields.io/badge/npm-v1.0.7-blue.svg" />
+
 Schema give you posibility to validate object using schema validation. You can defined schema and use validate method to check object. Validate method allways returns errors object but if You don't have errors object is empty so You can check errors by 
 ```js
 const schema = new Schema({
