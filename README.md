@@ -7,6 +7,8 @@
 
 Schema give you posibility to validate object using schema validation. You can defined schema and use validate method to check object. Validate method allways returns errors object but if You don't have errors object is empty so You can check errors by 
 ```js
+import Schema from 'form-schema-validation';
+
 const schema = new Schema({
     companyName: {
         type: String
@@ -35,6 +37,8 @@ const error = Object.keys(errors).length > 0; // false
 If You want create new schema You must put object to constructor with information about object keys names and type of value on key.
 
 ```js
+import Schema from 'form-schema-validation';
+
 const min = (minLength, message) => ({
     validator: (value) => {
         return value.length > minLength;
@@ -57,6 +61,43 @@ const schema = new Schema({
     workers: {
         type: Number
         label: 'How many workers we have'
+    }
+});
+```
+
+##### Example of schema in schema
+
+```js
+import Schema from 'form-schema-validation';
+
+const userSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    surname: {
+        type: String,
+        required: true
+    },
+    age: {
+        type: Number
+    }
+});
+
+const groupSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+        label: 'Group name'
+    },
+    createdAt: {
+        type: Date
+        defaultValue: new Date(),
+        label: 'Created at'
+    },
+    members: {
+        type: [userSchema]
+        label: 'Members'
     }
 });
 ```
