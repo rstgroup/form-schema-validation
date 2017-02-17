@@ -3,7 +3,7 @@
 <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" />
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" />
 <img src="https://img.shields.io/badge/license-MIT-blue.svg" />
-<img src="https://img.shields.io/badge/npm-v1.0.9-blue.svg" />
+<img src="https://img.shields.io/badge/npm-v1.2.0-blue.svg" />
 
 Schema give you posibility to validate object using schema validation. You can defined schema and use validate method to check object. Validate method allways returns errors object but if You don't have errors object is empty so You can check errors by 
 ```js
@@ -31,6 +31,20 @@ const error = Object.keys(errors).length > 0; // false
 | getDefaultValues |  | Get default values for model using defined schema |
 | getField | name: String | Get field schema |
 | getField |  | Get all fields schemas |
+
+#### Example of custom validator
+This validator will check two fields. You can validate one field on base another field.
+```js
+const validateIfFieldTitleIsFilled = (minLength, message) => ({
+    validator: (value, fieldSchema, formData) => {
+        if(formData.title){
+            return !!value;
+        }
+        return true;
+    },
+    errorMessage: message
+});
+```
 
 ### Schema definition Example
 

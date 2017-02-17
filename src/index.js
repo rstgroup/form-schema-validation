@@ -126,7 +126,7 @@ class Schema {
             if (fieldSchema.validators) {
                 const failedValidator = find(
                     fieldSchema.validators,
-                    v => !v.validator(value, fieldSchema.type)
+                    v => !v.validator(value, fieldSchema, validatedObject)
                 );
                 if (failedValidator) this.setError(key, failedValidator.errorMessage);
             }
