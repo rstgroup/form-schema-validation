@@ -5,14 +5,14 @@
 <img src="https://img.shields.io/badge/license-MIT-blue.svg" />
 <img src="https://img.shields.io/badge/npm-v1.2.0-blue.svg" />
 
-[1. Installation](#Installation)<br />
-[2. How to use](#How-to-use)<br />
-[3. Methods](#Methods)<br />
-[4. Example of custom validator](#Example-of-custom-validator)<br />
-[5. Schema definition Example](#Schema-definition-Example)<br />
-[6. Example of schema in schema](#Example-of-schema-in-schema)<br />
-[7. Schema keys description](#Schema-keys-description)<br />
-[8. Custom validation messages](#Custom-validation-messages)<br />
+[1. Installation](#installation)<br />
+[2. How to use](#how-to-use)<br />
+[3. Methods](#methods)<br />
+[4. Example of custom validator](#example-of-custom-validator)<br />
+[5. Schema definition Example](#schema-definition-example)<br />
+[6. Example of schema in schema](#example-of-schema-in-schema)<br />
+[7. Schema keys description](#schema-keys-description)<br />
+[8. Custom validation messages](#custom-validation-messages)<br />
 
 
 ###Installation
