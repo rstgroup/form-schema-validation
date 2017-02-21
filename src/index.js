@@ -53,7 +53,10 @@ class Schema {
                 return;
             }
             if (field.options) {
-                model[key] = this.getDefaultValueForModel(field.options[0], isArrayOfType);
+                model[key] = this.getDefaultValueForModel(
+                    field.options[0].value ? field.options[0].value : field.options[0],
+                    isArrayOfType
+                );
                 return;
             }
             if (fieldType instanceof Schema) {

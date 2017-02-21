@@ -467,6 +467,19 @@ describe('Schema', () => {
                     'test2'
                 ]
             },
+            language: {
+                type: String,
+                options: [
+                    {
+                        label: 'Polish - PL',
+                        value: 'polish'
+                    },
+                    {
+                        label: 'English - EN',
+                        value: 'english'
+                    }
+                ]
+            },
             currency: {
                 type: String,
                 defaultValue: 'EUR'
@@ -486,6 +499,7 @@ describe('Schema', () => {
         expect(typeof defaultModelValues.age).toBe('number');
         expect(defaultModelValues.isActive).toBe(false);
         expect(defaultModelValues.category).toBe('test');
+        expect(defaultModelValues.language).toBe('polish');
         expect(defaultModelValues.currency).toBe('EUR');
         expect(defaultModelValues.person.name).toBe('');
         expect(defaultModelValues.person.country).toBe('POLAND');
