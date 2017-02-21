@@ -5,23 +5,23 @@
 <img src="https://img.shields.io/badge/license-MIT-blue.svg" />
 <img src="https://img.shields.io/badge/npm-v1.2.0-blue.svg" />
 
-[1. Installation](#Installation)
-[2. How to use](#HowToUse)
-[3. Methods](#Methods)
-[4. Example of custom validator](#ExampleOfCustomValidator)
-[5. Schema definition Example](#SchemaDefinitionExample)
-[6. Example of schema in schema](#ExampleOfSchemaInSchema)
-[7. Schema keys description](#SchemaKeysDescription)
-[8. Custom validation messages](#CustomValidationMessages)
+[1. Installation](#Installation)<br />
+[2. How to use](#How-to-use)<br />
+[3. Methods](#Methods)<br />
+[4. Example of custom validator](#Example-of-custom-validator)<br />
+[5. Schema definition Example](#Schema-definition-Example)<br />
+[6. Example of schema in schema](#Example-of-schema-in-schema)<br />
+[7. Schema keys description](#Schema-keys-description)<br />
+[8. Custom validation messages](#Custom-validation-messages)<br />
 
 
-### Installation
+###Installation
 
 ```bash
 $ npm install form-schema-validation --save
 ```
 
-### How to use
+###How to use
 
 Schema give you posibility to validate object using schema validation. You can defined schema and use validate method to check object. Validate method allways returns errors object but if You don't have errors object is empty so You can check errors by 
 ```js
