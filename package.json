@@ -1,6 +1,6 @@
 {
   "name": "form-schema-validation",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Schema for form validation",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
@@ -14,13 +14,15 @@
   },
   "keywords": [
     "schema",
+    "form",
     "forms",
     "object",
     "validation",
     "validation-schema",
     "schema-validation",
     "js-schema",
-    "object-validation"
+    "object-validation",
+    "form-schema-validation"
   ],
   "author": "Mariusz Przodała",
   "license": "MIT",
