@@ -189,9 +189,7 @@ class Schema {
         const errors = type.validate(value);
         const keys = Object.keys(errors);
         if (keys.length === 0) return true;
-        keys.forEach((key) => {
-            errors[key].forEach(error => this.setError(subSchemaKey, error));
-        });
+        this.setError(subSchemaKey, errors);
         return false;
     }
 }

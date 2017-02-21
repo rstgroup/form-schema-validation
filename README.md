@@ -5,6 +5,24 @@
 <img src="https://img.shields.io/badge/license-MIT-blue.svg" />
 <img src="https://img.shields.io/badge/npm-v1.2.0-blue.svg" />
 
+[1. Installation](#Installation)
+[2. How to use](#HowToUse)
+[3. Methods](#Methods)
+[4. Example of custom validator](#ExampleOfCustomValidator)
+[5. Schema definition Example](#SchemaDefinitionExample)
+[6. Example of schema in schema](#ExampleOfSchemaInSchema)
+[7. Schema keys description](#SchemaKeysDescription)
+[8. Custom validation messages](#CustomValidationMessages)
+
+
+### Installation
+
+```bash
+$ npm install form-schema-validation --save
+```
+
+### How to use
+
 Schema give you posibility to validate object using schema validation. You can defined schema and use validate method to check object. Validate method allways returns errors object but if You don't have errors object is empty so You can check errors by 
 ```js
 import Schema from 'form-schema-validation';
@@ -129,3 +147,39 @@ When You defined schema You can use this keys:
 | options | Array of (String, Number, Object, Date, ...) | If you use schema for forms You can defined options for select field |
 | label | Any instance of String | If you use schema for forms You can defined label for form field |
 | validators | array of Functions | You can add custom validators for validate field for example min or max length of value. |
+
+
+#### Custom validation messages
+```js
+import Schema from 'form-schema-validation';
+
+ErrorMessages = {
+    notDefinedKey(key) { return `Key '${key}' is not defined in schema`; },
+    modelIsUndefined() { return 'Validated model is undefined'; },
+    validateRequired(key) { return `Field '${key}' is required`; },
+    validateString(key) { return `Field '${key}' is not a String`; },
+    validateNumber(key) { return `Field '${key}' is not a Number`; },
+    validateObject(key) { return `Field '${key}' is not a Object`; },
+    validateArray(key) { return `Field '${key}' is not a Array`; },
+    validateBoolean(key) { return `Field '${key}' is not a Boolean`; },
+    validateDate(key) { return `Field '${key}' is not a Date`; }
+};
+
+const groupSchema = new Schema({
+    name: {
+        type: String,
+        required: true,
+        label: 'Group name'
+    },
+    createdAt: {
+        type: Date
+        defaultValue: new Date(),
+        label: 'Created at'
+    },
+    members: {
+        type: [userSchema]
+        label: 'Members'
+    }
+});
+
+```

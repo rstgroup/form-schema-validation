@@ -348,6 +348,9 @@ describe('Schema', () => {
             const testObject2Errors = schema.validate(testObject2);
             expect(Object.keys(testObjectErrors).length).toBe(0);
             expect(Object.keys(testObject2Errors).length).toBe(1);
+            expect(testObject2Errors.owners.length).toBe(2);
+            expect(testObject2Errors.owners[0].name.length).toBe(1);
+            expect(testObject2Errors.owners[0].age.length).toBe(1);
         });
     });
 
