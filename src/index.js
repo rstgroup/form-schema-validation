@@ -36,32 +36,43 @@ class Schema {
         };
     }
 
+    getDefaultValueForModel(value, wrrapArray) {
+        return wrrapArray ? [value] : value;
+    }
+
     getDefaultValues() {
         const fieldsKeys = Object.keys(this.schema);
         const model = {};
         fieldsKeys.forEach((key) => {
             const field = this.getField(key);
-            if (field.type instanceof Schema) {
-                model[key] = field.type.getDefaultValues();
+            const isArrayOfType = Array.isArray(field.type);
+            const fieldType = isArrayOfType? field.type[0] : field.type;
+
+            if (field.defaultValue) {
+                model[key] = this.getDefaultValueForModel(field.defaultValue, isArrayOfType);
                 return;
             }
-            if (field.defaultValue){
-                model[key] = field.defaultValue;
+            if (field.options) {
+                model[key] = this.getDefaultValueForModel(field.options[0], isArrayOfType);
                 return;
             }
-            if (field.options){
-                model[key] = field.options[0];
+            if (fieldType instanceof Schema) {
+                model[key] = this.getDefaultValueForModel(fieldType.getDefaultValues(), isArrayOfType);
                 return;
             }
-            if (field.type.name === 'Number'){
-                model[key] = NaN;
+            if (fieldType.name === 'Number') {
+                model[key] = this.getDefaultValueForModel(NaN, isArrayOfType);
                 return;
             }
-            if (field.type.name === 'Boolean'){
-                model[key] = false;
+            if (fieldType.name === 'Boolean') {
+                model[key] = this.getDefaultValueForModel(false, isArrayOfType);
                 return;
             }
-            model[key] = '';
+            if (fieldType.name === 'Object') {
+                model[key] = this.getDefaultValueForModel({}, isArrayOfType);
+                return;
+            }
+            model[key] = this.getDefaultValueForModel('', isArrayOfType);
         });
         return model;
     }

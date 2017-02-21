@@ -473,6 +473,12 @@ describe('Schema', () => {
             },
             person: {
                 type: personSchema
+            },
+            members: {
+                type: [personSchema]
+            },
+            data: {
+                type: Object
             }
         });
         const defaultModelValues = schema.getDefaultValues();
@@ -483,6 +489,9 @@ describe('Schema', () => {
         expect(defaultModelValues.currency).toBe('EUR');
         expect(defaultModelValues.person.name).toBe('');
         expect(defaultModelValues.person.country).toBe('POLAND');
+        expect(defaultModelValues.members[0].name).toBe('');
+        expect(defaultModelValues.members[0].country).toBe('POLAND');
+        expect(defaultModelValues.data instanceof Object).toBe(true);
     });
 
     it('should throw error if type is unrecognized', () => {
