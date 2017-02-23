@@ -334,8 +334,16 @@ describe('Schema', () => {
             const testObject2 = {
                 owners: [
                     {
+                        name: 'Mike',
+                        age: 20
+                    },
+                    {
                         name: 123,
                         age: 'test'
+                    },
+                    {
+                        name: 'Mike',
+                        age: 20
                     },
                     {
                         name: 323,
@@ -348,9 +356,9 @@ describe('Schema', () => {
             const testObject2Errors = schema.validate(testObject2);
             expect(Object.keys(testObjectErrors).length).toBe(0);
             expect(Object.keys(testObject2Errors).length).toBe(1);
-            expect(testObject2Errors.owners.length).toBe(2);
-            expect(testObject2Errors.owners[0].name.length).toBe(1);
-            expect(testObject2Errors.owners[0].age.length).toBe(1);
+            expect(testObject2Errors.owners.length).toBe(4);
+            expect(testObject2Errors.owners[1].name.length).toBe(1);
+            expect(testObject2Errors.owners[1].age.length).toBe(1);
         });
     });
 

@@ -97,8 +97,12 @@ class Schema {
         return this.errors;
     }
 
-    setError(key, message) {
+    setError(key, message, index) {
         if (!this.errors[key]) this.errors[key] = [];
+        if (index > -1) {
+            this.errors[key][index] = message;
+            return;
+        }
         this.errors[key].push(message);
     }
 
@@ -130,8 +134,8 @@ class Schema {
             const isArrayOfType = Array.isArray(fieldSchema.type);
             const fieldType = isArrayOfType ? fieldSchema.type[0] : fieldSchema.type;
             if (isArrayOfType && this.validateType(Array, value)){
-                value.forEach(item => {
-                    this.validateType(fieldType, item, key);
+                value.forEach((item, index) => {
+                    this.validateType(fieldType, item, key, index);
                 });
             } else {
                 this.validateType(fieldType, value, key);
@@ -153,57 +157,57 @@ class Schema {
         }
     }
 
-    validateType(type, value, key) {
+    validateType(type, value, key, index) {
         if (typeof this.typesValidators[type.name] === 'function') {
-            return this.typesValidators[type.name](value, key, type);
+            return this.typesValidators[type.name](value, key, type, index);
         }
         if (type instanceof Schema) {
-            return this.validateTypeSchema(value, key, type)
+            return this.validateTypeSchema(value, key, type, index)
         }
         throw new Error(`Unrecognized type ${type.name}`);
     }
 
-    validateTypeString(value, key) {
+    validateTypeString(value, key, index) {
         if (typeof value === 'string') return true;
-        this.setError(key, this.messages.validateString(key));
+        this.setError(key, this.messages.validateString(key), index);
         return false;
     }
 
-    validateTypeNumber(value, key) {
+    validateTypeNumber(value, key, index) {
         if (typeof value === 'number') return true;
-        this.setError(key, this.messages.validateNumber(key));
+        this.setError(key, this.messages.validateNumber(key), index);
         return false;
     }
 
-    validateTypeObject(value, key) {
+    validateTypeObject(value, key, index) {
         if (typeof value === 'object' && !Array.isArray(value)) return true;
-        this.setError(key, this.messages.validateObject(key));
+        this.setError(key, this.messages.validateObject(key), index);
         return false;
     }
 
-    validateTypeArray(value, key) {
+    validateTypeArray(value, key, index) {
         if (Array.isArray(value)) return true;
-        this.setError(key, this.messages.validateArray(key));
+        this.setError(key, this.messages.validateArray(key), index);
         return false;
     }
 
-    validateTypeBoolean(value, key) {
+    validateTypeBoolean(value, key, index) {
         if(typeof value === 'boolean') return true;
-        this.setError(key, this.messages.validateBoolean(key));
+        this.setError(key, this.messages.validateBoolean(key), index);
         return false;
     }
 
-    validateTypeDate(value, key) {
+    validateTypeDate(value, key, index) {
         if(value instanceof Date) return true;
-        this.setError(key, this.messages.validateDate(key));
+        this.setError(key, this.messages.validateDate(key), index);
         return false;
     }
 
-    validateTypeSchema(value, subSchemaKey, type) {
+    validateTypeSchema(value, subSchemaKey, type, index) {
         const errors = type.validate(value);
         const keys = Object.keys(errors);
         if (keys.length === 0) return true;
-        this.setError(subSchemaKey, errors);
+        this.setError(subSchemaKey, errors, index);
         return false;
     }
 }
