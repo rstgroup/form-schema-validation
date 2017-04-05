@@ -383,41 +383,114 @@ describe('Schema', () => {
         expect(Object.keys(testObjectErrors).length).toBe(0);
         expect(Object.keys(testObject2Errors).length).toBe(1);
     });
+    describe('should validate using custom validators', () => {
+        jest.useFakeTimers();
 
-    it('should validate using custom validators', () => {
-        const minLength = (length, message) => ({
-            validator(value) {
-                return value.length >= length;
-            },
-            errorMessage: `Min length ${length}`
-        });
-        const maxLength = (length, message) => ({
-            validator(value) {
-                return value.length <= length;
-            },
-            errorMessage: `Max length ${length}`
+        it('sync', () => {
+            const minLength = (length, message) => ({
+                validator(value) {
+                    return value.length >= length;
+                },
+                errorMessage: `Min length ${length}`
+            });
+            const maxLength = (length, message) => ({
+                validator(value) {
+                    return value.length <= length;
+                },
+                errorMessage: `Max length ${length}`
+            });
+
+            const schema = new Schema({
+                companyName: {
+                    type: String,
+                    required: true,
+                    validators: [minLength(3), maxLength(20)]
+                }
+            });
+
+            const testObject = {
+                companyName: 'test company'
+            };
+
+            const testObject2 = {
+                companyName: 't1'
+            };
+
+            const testObjectErrors = schema.validate(testObject);
+            const testObject2Errors = schema.validate(testObject2);
+            expect(Object.keys(testObjectErrors).length).toBe(0);
+            expect(Object.keys(testObject2Errors).length).toBe(1);
         });
 
-        const schema = new Schema({
-            companyName: {
-                type: String,
-                required: true,
-                validators: [minLength(3), maxLength(20)]
+
+        it('async with promise (1 error)', (done) => {
+            const asyncValidator = () => ({
+                validator(value) {
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            resolve(value === 'test company');
+                        },100);
+                    });
+                },
+                errorMessage: `async validation failed`
+            });
+
+            const schema = new Schema({
+                companyName: {
+                    type: String,
+                    required: true,
+                    validators: [asyncValidator()]
+                }
+            });
+
+            const testObject = {
+                companyName: 'test company2'
+            };
+
+            const testObjectErrors = schema.validate(testObject);
+            jest.runOnlyPendingTimers();
+            if(testObjectErrors instanceof Promise) {
+                testObjectErrors.then((results) => {
+                    expect(Object.keys(results).length).toBe(1);
+                    done();
+                });
             }
         });
 
-        const testObject = {
-            companyName: 'test company'
-        };
+        it('async with promise (0 error)', (done) => {
+            const asyncValidator = () => ({
+                validator(value) {
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            resolve(value === 'test company2');
+                        },100);
+                    });
+                },
+                errorMessage: `async validation failed`
+            });
 
-        const testObject2 = {
-            companyName: 't1'
-        };
+            const schema = new Schema({
+                companyName: {
+                    type: String,
+                    required: true,
+                    validators: [asyncValidator()]
+                }
+            });
 
-        const testObjectErrors = schema.validate(testObject);
-        const testObject2Errors = schema.validate(testObject2);
-        expect(Object.keys(testObjectErrors).length).toBe(0);
-        expect(Object.keys(testObject2Errors).length).toBe(1);
+            const testObject = {
+                companyName: 'test company2'
+            };
+
+            const testObjectErrors = schema.validate(testObject);
+            jest.runOnlyPendingTimers();
+            if(testObjectErrors instanceof Promise) {
+                testObjectErrors.then((results) => {
+                    expect(Object.keys(results).length).toBe(0);
+                    done();
+                });
+            }
+        });
+
     });
 
     it('should return model error if model is undefined', () => {

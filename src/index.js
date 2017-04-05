@@ -16,6 +16,7 @@ class Schema {
     constructor(schema, messages) {
         this.schema = schema;
         this.errors = {};
+        this.promises = [];
         this.messages = messages || defaultMessages;
 
         this.validateTypeString = this.validateTypeString.bind(this);
@@ -90,9 +91,17 @@ class Schema {
 
     validate(model) {
         this.errors = {};
+        this.promises = [];
         if(this.checkModel(model)) {
             this.checkKeysDiff(model);
             this.checkTypesAndValidators(model);
+        }
+        if(this.promises.length > 0) {
+            return new Promise((resolve) => {
+                Promise
+                    .all(this.promises)
+                    .then(resolve(this.errors));
+            });
         }
         return this.errors;
     }
@@ -141,14 +150,28 @@ class Schema {
                 this.validateType(fieldType, value, key);
             }
             this.validateRequired(fieldSchema, value, key);
-            if (fieldSchema.validators) {
-                const failedValidator = find(
-                    fieldSchema.validators,
-                    v => !v.validator(value, fieldSchema, validatedObject)
-                );
-                if (failedValidator) this.setError(key, failedValidator.errorMessage);
-            }
+            this.validateCustomValidators({
+                validators: fieldSchema.validators,
+                value,
+                fieldSchema,
+                validatedObject,
+                key
+            });
         })
+    }
+
+    validateCustomValidators({ validators, value, fieldSchema, validatedObject, key }) {
+        if(!validators) return;
+        validators.forEach(({validator, errorMessage}) => {
+            const results = validator(value, fieldSchema, validatedObject);
+            if (results instanceof Promise) {
+                this.promises.push(results.then((result) => {
+                    if(!result) this.setError(key, errorMessage);
+                }));
+                return;
+            }
+            if(!results) this.setError(key, errorMessage);
+        });
     }
 
     validateRequired(fieldSchema, value, key) {

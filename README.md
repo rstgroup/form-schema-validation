@@ -3,7 +3,7 @@
 <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" />
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" />
 <img src="https://img.shields.io/badge/license-MIT-blue.svg" />
-<img src="https://img.shields.io/badge/npm-v1.2.4-blue.svg" />
+<img src="https://img.shields.io/badge/npm-v1.3.0-blue.svg" />
 
 [1. Installation](#installation)<br />
 [2. How to use](#how-to-use)<br />
@@ -15,13 +15,13 @@
 [8. Custom validation messages](#custom-validation-messages)<br />
 
 
-###Installation
+### Installation
 
 ```bash
 $ npm install form-schema-validation --save
 ```
 
-###How to use
+### How to use
 
 Schema give you posibility to validate object using schema validation. You can defined schema and use validate method to check object. Validate method allways returns errors object but if You don't have errors object is empty so You can check errors by 
 ```js
@@ -39,6 +39,41 @@ const modelObject = {
 
 const errors = schema.validate(modelObject); // {}
 const error = Object.keys(errors).length > 0; // false
+```
+
+### Promises support
+
+You can use validators that return Promise. If You return promis in validator then shema.validate(model) will return Promise.
+
+```js
+import Schema from 'form-schema-validation';
+
+const customValidator = {
+    validator: (value) => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(value === 'test');
+            }, 1000);
+        });
+    },
+    errorMessage: 'async test error';
+}
+
+const schema = new Schema({
+    companyName: {
+        type: String,
+        validators:[customValidator]
+    }
+});
+
+const modelObject = {
+    companyName: 'Test Company'
+};
+
+const results = schema.validate(modelObject); // Promise
+results.then((errors) => {
+    console.log(Object.keys(errors).length > 0); // true
+});
 ```
 
 ### Methods
