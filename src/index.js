@@ -55,7 +55,7 @@ class Schema {
             }
             if (field.options) {
                 model[key] = this.getDefaultValueForModel(
-                    field.options[0].value ? field.options[0].value : field.options[0],
+                    field.options[0].label ? field.options[0].value : field.options[0],
                     isArrayOfType
                 );
                 return;
