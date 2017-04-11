@@ -3,11 +3,12 @@
 <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" />
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" />
 <img src="https://img.shields.io/badge/license-MIT-blue.svg" />
-<img src="https://img.shields.io/badge/npm-v1.4.2-blue.svg" />
+<img src="https://img.shields.io/badge/npm-v1.5.0-blue.svg" />
 
 [1. Installation](#installation)<br />
 [2. How to use](#how-to-use)<br />
 [3. Methods](#methods)<br />
+[3. Types](#types)<br />
 [4. Example of custom validator](#example-of-custom-validator)<br />
 [5. Schema definition Example](#schema-definition-example)<br />
 [6. Example of schema in schema](#example-of-schema-in-schema)<br />
@@ -84,6 +85,20 @@ results.then((errors) => {
 | getDefaultValues |  | Get default values for model using defined schema |
 | getField | name: String | Get field schema |
 | getField |  | Get all fields schemas |
+| oneOfTypes | types: Array of types | Give posibility to validate one of type (Static method) |
+
+### Types
+
+| Name | Description |
+|---|---|
+| String | Simple String type |
+| Number | Simple Number type |
+| Object | Simple Object type this type give you posibility to black box |
+| Boolean | Simple Boolean type |
+| Date | This type check value is instance of Date |
+| new Schema | This type check value is instance of Schema and validate value by this schema |
+| Schema.oneOfType([type1, type2, ...]) | This type give you posibility check one of types it will return error if value don't match all types |
+
 
 #### Example of custom validator
 This validator will check two fields. You can validate one field on base another field.
@@ -121,7 +136,7 @@ const schema = new Schema({
         validators: [min(2, 'Company name should be longer then 2 chars')]
     },
     createdAt: {
-        type: Date
+        type: Schema.oneOfTypes([Date, String]),
         defaultValue: new Date(),
         label: 'When start'
     },
