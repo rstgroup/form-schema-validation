@@ -1,4 +1,5 @@
 import { pick, difference } from './helpers';
+import OneOfTypes from './oneOfTypes';
 
 const defaultMessages = {
     notDefinedKey(key) { return `Key '${key}' is not defined in schema`; },
@@ -35,6 +36,10 @@ class Schema {
             Boolean: this.validateTypeBoolean,
             Date: this.validateTypeDate,
         };
+    }
+
+    static oneOfTypes(types) {
+        return new OneOfTypes(types);
     }
 
     getDefaultValueForModel(value, wrrapArray) {
@@ -187,6 +192,9 @@ class Schema {
         if (type instanceof Schema) {
             return this.validateTypeSchema(value, key, type, index)
         }
+        if (type instanceof OneOfTypes) {
+            return this.validateOneOfTypes(value, key, type, index);
+        }
         throw new Error(`Unrecognized type ${type.name}`);
     }
 
@@ -231,6 +239,15 @@ class Schema {
         const keys = Object.keys(errors);
         if (keys.length === 0) return true;
         this.setError(subSchemaKey, errors, index);
+        return false;
+    }
+
+    validateOneOfTypes(value, key, type, index) {
+        const schema = new Schema(type.getSchema());
+        const errors = schema.validate(type.parseValue(value));
+        const keys = Object.keys(errors);
+        if (keys.length < type.getTypes().length) return true;
+        this.setError(key, errors, index);
         return false;
     }
 }

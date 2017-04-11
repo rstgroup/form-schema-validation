@@ -165,6 +165,53 @@ describe('Schema', () => {
             expect(Object.keys(testObjectErrors).length).toBe(0);
             expect(Object.keys(testObject2Errors).length).toBe(1);
         });
+
+        it('should validate OneOfTypes', () => {
+            const personSchema = new Schema({
+                name: {
+                    type: Schema.oneOfTypes([String, Number])
+                },
+                age: {
+                    type: Number
+                }
+            });
+
+            const schema = new Schema({
+                owner: {
+                    type: personSchema
+                }
+            });
+
+            const testObject = {
+                owner: {
+                    name: 'Mike',
+                    age: 20
+                }
+            };
+
+            const testObject2 = {
+                owner: {
+                    name: 123,
+                    age: 22
+                }
+            };
+
+            const testObject3 = {
+                owner: {
+                    name: {
+                        first: 'Mike'
+                    },
+                    age: 'test'
+                }
+            };
+
+            const testObjectErrors = schema.validate(testObject);
+            const testObject2Errors = schema.validate(testObject2);
+            const testObject3Errors = schema.validate(testObject3);
+            expect(Object.keys(testObjectErrors).length).toBe(0);
+            expect(Object.keys(testObject2Errors).length).toBe(0);
+            expect(Object.keys(testObject3Errors).length).toBe(1);
+        });
     });
 
     describe('Validation array of types', () => {
@@ -359,6 +406,88 @@ describe('Schema', () => {
             expect(testObject2Errors.owners.length).toBe(4);
             expect(testObject2Errors.owners[1].name.length).toBe(1);
             expect(testObject2Errors.owners[1].age.length).toBe(1);
+        });
+
+        it('should validate array of OneOfTypes', () => {
+            const personSchema = new Schema({
+                name: {
+                    type: Schema.oneOfTypes([String, Number])
+                },
+                age: {
+                    type: Number
+                }
+            });
+
+            const schema = new Schema({
+                owners: {
+                    type: [personSchema]
+                }
+            });
+
+            const testObject = {
+                owners: [
+                    {
+                        name: 'Mike',
+                        age: 20
+                    },
+                    {
+                        name: 'Mike2',
+                        age: 21
+                    }
+                ]
+            };
+
+            const testObject2 = {
+                owners: [
+                    {
+                        name: 'Mike',
+                        age: 20
+                    },
+                    {
+                        name: 123,
+                        age: 22
+                    },
+                    {
+                        name: 'Mike',
+                        age: 20
+                    },
+                    {
+                        name: 323,
+                        age: 12
+                    }
+                ]
+            };
+
+            const testObject3 = {
+                owners: [
+                    {
+                        name: {
+                            first: 'Mike'
+                        },
+                        age: 20
+                    },
+                    {
+                        name: 123,
+                        age: 'test'
+                    },
+                    {
+                        name: 'Mike',
+                        age: 20
+                    },
+                    {
+                        name: 323,
+                        age: 'test2'
+                    }
+                ]
+            };
+
+            const testObjectErrors = schema.validate(testObject);
+            const testObject2Errors = schema.validate(testObject2);
+            const testObject3Errors = schema.validate(testObject3);
+            expect(Object.keys(testObjectErrors).length).toBe(0);
+            expect(Object.keys(testObject2Errors).length).toBe(0);
+            expect(Object.keys(testObject3Errors).length).toBe(1);
+            expect(testObject3Errors.owners[0].name.length).toBe(1);
         });
     });
 
