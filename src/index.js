@@ -1,4 +1,4 @@
-import { pick, difference, find } from 'lodash';
+import { pick, difference } from './helpers';
 
 const defaultMessages = {
     notDefinedKey(key) { return `Key '${key}' is not defined in schema`; },

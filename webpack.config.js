@@ -1,9 +1,10 @@
 var webpack = require('webpack');
+var path = require('path');
 
 module.exports = {
-    entry: "./src/index.js",
+    entry: path.resolve(__dirname, "./src/index.js"),
     output: {
-        path: './lib/',
+        path: path.resolve(__dirname, "./lib/"),
         filename: "index.js",
         libraryTarget: "umd"
     },

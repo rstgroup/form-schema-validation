@@ -25,10 +25,6 @@
     "form-schema-validation"
   ],
   "author": "Mariusz Przodała",
-  "license": "MIT",
-  "dependencies": {
-    "lodash": "^4.17.3"
-  },
   "devDependencies": {
     "babel-core": "^6.21.0",
     "babel-jest": "^18.0.0",
