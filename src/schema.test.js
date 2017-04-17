@@ -769,4 +769,46 @@ describe('Schema', () => {
 
         expect(schema.getFields()).toBe(schemaObject);
     });
+
+    it('should dont validate keys not defined in schema', () => {
+        const schemaObject = {
+            companyName: {
+                type: String
+            },
+            age: {
+                type: Number
+            },
+            isActive: {
+                type: Boolean
+            },
+            category: {
+                type: String,
+                options: [
+                    'test',
+                    'test2'
+                ]
+            },
+            currency: {
+                type: String,
+                defaultValue: 'EUR'
+            }
+        };
+        const normalSchema = new Schema(schemaObject);
+        const dontValidateKeysSchema = new Schema(schemaObject, false, false);
+
+        const data = {
+            companyName: 'test',
+            age: 12,
+            isActive: true,
+            category: 'test',
+            currency: 'PLN',
+            _id: 'test1234567890'
+        };
+
+        const errors = normalSchema.validate(data);
+        const errors2 = dontValidateKeysSchema.validate(data);
+
+        expect(Object.keys(errors).length).toBe(1);
+        expect(Object.keys(errors2).length).toBe(0);
+    });
 });

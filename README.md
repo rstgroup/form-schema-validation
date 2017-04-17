@@ -3,17 +3,19 @@
 <img src="https://img.shields.io/badge/build-passing-brightgreen.svg" />
 <img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" />
 <img src="https://img.shields.io/badge/license-MIT-blue.svg" />
-<img src="https://img.shields.io/badge/npm-v1.5.0-blue.svg" />
+<img src="https://img.shields.io/badge/npm-v1.6.0-blue.svg" />
 
 [1. Installation](#installation)<br />
 [2. How to use](#how-to-use)<br />
-[3. Methods](#methods)<br />
-[3. Types](#types)<br />
-[4. Example of custom validator](#example-of-custom-validator)<br />
-[5. Schema definition Example](#schema-definition-example)<br />
-[6. Example of schema in schema](#example-of-schema-in-schema)<br />
-[7. Schema keys description](#schema-keys-description)<br />
-[8. Custom validation messages](#custom-validation-messages)<br />
+[3. Constructor](#constructor)<br />
+[4. Methods](#methods)<br />
+[5. Types](#types)<br />
+[6. Example of custom validator](#example-of-custom-validator)<br />
+[7. Schema definition Example](#schema-definition-example)<br />
+[8. Example of schema in schema](#example-of-schema-in-schema)<br />
+[9. Schema keys description](#schema-keys-description)<br />
+[10. Custom validation messages](#custom-validation-messages)<br />
+[11. Switch of keys validation](#switch-of-keys-validation)<br />
 
 
 ### Installation
@@ -76,6 +78,15 @@ results.then((errors) => {
     console.log(Object.keys(errors).length > 0); // true
 });
 ```
+
+
+### Constructor
+
+| Name | Type | Description |
+|---|---|---|
+| schema | Object | schema will be used when you validate object |
+| errorMessages | Object | errors messages that will be displayed on error |
+| validateKeys | Boolean | this flag give you posibility to don't validate object keys not defined in schema |
 
 ### Methods
 
@@ -230,6 +241,27 @@ const groupSchema = new Schema({
         type: [userSchema]
         label: 'Members'
     }
-});
+}, ErrorMessages);
+
+```
+
+#### Switch of keys validation
+```js
+import Schema from 'form-schema-validation';
+
+const schema = new Schema({
+    companyName: {
+        type: String,
+        required: true
+    }
+}, false, false);
+
+const modelObject = {
+    companyName: 'Test Company',
+    _id: 'test1234567890',
+};
+
+const errors = schema.validate(modelObject);
+console.log(Object.keys(errors).length > 0); // false
 
 ```

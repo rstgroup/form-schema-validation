@@ -14,11 +14,12 @@ const defaultMessages = {
 };
 
 class Schema {
-    constructor(schema, messages) {
+    constructor(schema, messages, validateKeys = true) {
         this.schema = schema;
         this.errors = {};
         this.promises = [];
         this.messages = messages || defaultMessages;
+        this.validateKeys = validateKeys;
 
         this.validateTypeString = this.validateTypeString.bind(this);
         this.validateTypeNumber = this.validateTypeNumber.bind(this);
@@ -129,6 +130,7 @@ class Schema {
     }
 
     checkKeysDiff(model) {
+        if (!this.validateKeys) return true;
         const modelKeys = Object.keys(model);
         const schemaKeys = Object.keys(this.schema);
         const keysDiff = difference(modelKeys, schemaKeys);
