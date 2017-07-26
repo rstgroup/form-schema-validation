@@ -167,17 +167,36 @@ class Schema {
         })
     }
 
+    resolveValidatorErrorsForKey(key, errorMessage, results) {
+        if (typeof results === 'boolean' && !results) {
+            this.setError(key, errorMessage);
+            return;
+        }
+        if (Array.isArray(results)) {
+            results.forEach((result) => {
+                this.resolveValidatorErrorsForKey(key, errorMessage, result);
+            });
+            return;
+        }
+        if (typeof results === 'string') {
+            this.resolveValidatorErrorsForKey(key, results, false);
+        }
+    }
+
     validateCustomValidators({ validators, value, fieldSchema, validatedObject, key }) {
-        if(!validators) return;
+        if (!validators) {
+            return;
+        }
         validators.forEach(({validator, errorMessage}) => {
             const results = validator(value, fieldSchema, validatedObject);
             if (results instanceof Promise) {
-                this.promises.push(results.then((result) => {
-                    if(!result) this.setError(key, errorMessage);
-                }));
+                const promise = results.then((results) => {
+                    this.resolveValidatorErrorsForKey(key, errorMessage, results);
+                });
+                this.promises.push(promise);
                 return;
             }
-            if(!results) this.setError(key, errorMessage);
+            this.resolveValidatorErrorsForKey(key, errorMessage, results);
         });
     }
 
