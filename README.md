@@ -26,7 +26,7 @@ $ npm install form-schema-validation --save
 
 ### How to use
 
-Schema give you posibility to validate object using schema validation. You can defined schema and use validate method to check object. Validate method allways returns errors object but if You don't have errors object is empty so You can check errors by 
+Schema give you posibility to validate object using schema validation. You can defined schema and use validate method to check object. Validate method allways returns errors object but if You don't have errors object is empty so You can check errors by
 ```js
 import Schema from 'form-schema-validation';
 
@@ -125,6 +125,22 @@ const validateIfFieldTitleIsFilled = (minLength, message) => ({
 });
 ```
 
+### Example of dynamic error messages
+
+There can be a need for error messages generated based on the validation outcome. In that case a string or array of strings can be returned from the validator function. Error messages returned from validator function have higher priority that the errorMessage property.
+
+```js
+const MIN_AGE = 18;
+const validateIfOfAge = () => ({
+    validator: (value, fieldSchema, formData) => {
+        const { age } = formData;
+        if (age <= MIN_AGE) {
+            return [`Given ${age} is lower than required age of ${MIN_AGE}`];
+        }
+    }
+});
+```
+
 ### Schema definition Example
 
 If You want create new schema You must put object to constructor with information about object keys names and type of value on key.
@@ -197,7 +213,7 @@ const groupSchema = new Schema({
 
 #### Schema keys description
 
-When You defined schema You can use this keys: 
+When You defined schema You can use this keys:
 
 | Key | Allowed values | Description |
 |---|---|---|
@@ -214,7 +230,7 @@ When You defined schema You can use this keys:
 ```js
 import Schema from 'form-schema-validation';
 
-ErrorMessages = {
+const ErrorMessages = {
     notDefinedKey(key) { return `Key '${key}' is not defined in schema`; },
     modelIsUndefined() { return 'Validated model is undefined'; },
     validateRequired(key) { return `Field '${key}' is required`; },

@@ -620,6 +620,36 @@ describe('Schema', () => {
             }
         });
 
+        it('should be able to return multiple errorMessages in an array from validator', () => {
+            const errorMessages = ['bar', 'biz'];
+            const validatorObject = {
+                validator: () => errorMessages
+            };
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                    validators: [validatorObject]
+                }
+            });
+            const results = schema.validate({ foo: 'foo' });
+            expect(results.foo).toEqual(errorMessages);
+        });
+
+        it('should be able to return single errorMessage from validator', () => {
+            const errorMessage = 'bar';
+            const validatorObject = {
+                validator: () => errorMessage
+            };
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                    validators: [validatorObject]
+                }
+            });
+            const results = schema.validate({ foo: 'foo' });
+            expect(results.foo).toEqual([errorMessage]);
+        });
+
     });
 
     it('should return model error if model is undefined', () => {
