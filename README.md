@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/mprzodala/form-schema-validation.svg?branch=master)](https://travis-ci.org/mprzodala/form-schema-validation)
 [![Coverage Status](https://coveralls.io/repos/github/mprzodala/form-schema-validation/badge.svg?branch=master)](https://coveralls.io/github/mprzodala/form-schema-validation?branch=master)
-[![npm](https://img.shields.io/npm/l/form-schema-validation.svg)](https://npmjs.org/package/react-components-form)
-[![npm](https://img.shields.io/npm/v/form-schema-validation.svg)](https://npmjs.org/package/react-components-form)
+[![npm](https://img.shields.io/npm/l/form-schema-validation.svg)](https://npmjs.org/package/form-schema-validation)
+[![npm](https://img.shields.io/npm/v/form-schema-validation.svg)](https://npmjs.org/package/form-schema-validation)
 
 [1. Installation](#installation)<br />
 [2. How to use](#how-to-use)<br />
