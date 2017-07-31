@@ -10,7 +10,9 @@
   "scripts": {
     "test": "jest",
     "build": "webpack -p --config webpack.config.js",
-    "prepublish": "npm run build"
+    "prepublish": "npm run build",
+    "coverage": "jest --coverage",
+    "coverage:report": "cat ./coverage/lcov.info | coveralls"
   },
   "keywords": [
     "schema",
