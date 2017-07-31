@@ -1,9 +1,9 @@
 # SCHEMA
 
-<img src="https://img.shields.io/badge/build-passing-brightgreen.svg" />
-<img src="https://img.shields.io/badge/coverage-100%25-brightgreen.svg" />
-<img src="https://img.shields.io/badge/license-MIT-blue.svg" />
-<img src="https://img.shields.io/badge/npm-v1.6.0-blue.svg" />
+[![Build Status](https://travis-ci.org/mprzodala/form-schema-validation.svg?branch=master)](https://travis-ci.org/mprzodala/form-schema-validation)
+[![Coverage Status](https://coveralls.io/repos/github/mprzodala/form-schema-validation/badge.svg?branch=master)](https://coveralls.io/github/mprzodala/form-schema-validation?branch=master)
+[![npm](https://img.shields.io/npm/l/form-schema-validation.svg)](https://npmjs.org/package/react-components-form)
+[![npm](https://img.shields.io/npm/v/form-schema-validation.svg)](https://npmjs.org/package/react-components-form)
 
 [1. Installation](#installation)<br />
 [2. How to use](#how-to-use)<br />
