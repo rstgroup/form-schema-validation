@@ -232,7 +232,7 @@ class Schema {
     }
 
     validateTypeObject(value, key, index) {
-        if (typeof value === 'object' && !Array.isArray(value)) return true;
+        if (typeof value === 'object' && !Array.isArray(value) && value !== null) return true;
         this.setError(key, this.messages.validateObject(key), index);
         return false;
     }
