@@ -82,10 +82,16 @@ describe('Schema', () => {
                 data: 'test'
             };
 
+            const testObject3 = {
+                data: null
+            };
+
             const testObjectErrors = schema.validate(testObject);
             const testObject2Errors = schema.validate(testObject2);
+            const testObject3Errors = schema.validate(testObject3);
             expect(Object.keys(testObjectErrors).length).toBe(0);
             expect(Object.keys(testObject2Errors).length).toBe(1);
+            expect(Object.keys(testObject3Errors).length).toBe(1);
         });
 
         it('should validate Date', () => {
