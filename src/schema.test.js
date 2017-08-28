@@ -5,15 +5,15 @@ describe('Schema', () => {
         it('should validate String', () => {
             const schema = new Schema({
                 companyName: {
-                    type: String
-                }
+                    type: String,
+                },
             });
             const testObject = {
-                companyName: 'Test Company'
+                companyName: 'Test Company',
             };
 
             const testObject2 = {
-                companyName: 2345
+                companyName: 2345,
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -25,16 +25,16 @@ describe('Schema', () => {
         it('should validate Number', () => {
             const schema = new Schema({
                 companyNumber: {
-                    type: Number
-                }
+                    type: Number,
+                },
             });
 
             const testObject = {
-                companyNumber: 2345
+                companyNumber: 2345,
             };
 
             const testObject2 = {
-                companyNumber: 'Test Company'
+                companyNumber: 'Test Company',
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -46,16 +46,16 @@ describe('Schema', () => {
         it('should validate Boolean', () => {
             const schema = new Schema({
                 isActive: {
-                    type: Boolean
-                }
+                    type: Boolean,
+                },
             });
 
             const testObject = {
-                isActive: true
+                isActive: true,
             };
 
             const testObject2 = {
-                isActive: 'test'
+                isActive: 'test',
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -67,23 +67,23 @@ describe('Schema', () => {
         it('should validate Object', () => {
             const schema = new Schema({
                 data: {
-                    type: Object
-                }
+                    type: Object,
+                },
             });
 
             const testObject = {
                 data: {
                     title: 'title description',
-                    description: 'test description'
-                }
+                    description: 'test description',
+                },
             };
 
             const testObject2 = {
-                data: 'test'
+                data: 'test',
             };
 
             const testObject3 = {
-                data: null
+                data: null,
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -97,16 +97,16 @@ describe('Schema', () => {
         it('should validate Date', () => {
             const schema = new Schema({
                 createdAt: {
-                    type: Date
-                }
+                    type: Date,
+                },
             });
 
             const testObject = {
-                createdAt: new Date()
+                createdAt: new Date(),
             };
 
             const testObject2 = {
-                createdAt: '2017-01-01'
+                createdAt: '2017-01-01',
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -118,16 +118,16 @@ describe('Schema', () => {
         it('should validate Array', () => {
             const schema = new Schema({
                 names: {
-                    type: Array
-                }
+                    type: Array,
+                },
             });
 
             const testObject = {
-                names: ['Mike','Nicolas']
+                names: ['Mike', 'Nicolas'],
             };
 
             const testObject2 = {
-                names: 'Mike,Nicolas'
+                names: 'Mike,Nicolas',
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -139,31 +139,31 @@ describe('Schema', () => {
         it('should validate Schema', () => {
             const personSchema = new Schema({
                 name: {
-                    type: String
+                    type: String,
                 },
                 age: {
-                    type: Number
-                }
+                    type: Number,
+                },
             });
 
             const schema = new Schema({
                 owner: {
-                    type: personSchema
-                }
+                    type: personSchema,
+                },
             });
 
             const testObject = {
                 owner: {
                     name: 'Mike',
-                    age: 20
-                }
+                    age: 20,
+                },
             };
 
             const testObject2 = {
                 owner: {
                     name: 123,
-                    age: 'test'
-                }
+                    age: 'test',
+                },
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -175,40 +175,40 @@ describe('Schema', () => {
         it('should validate OneOfTypes', () => {
             const personSchema = new Schema({
                 name: {
-                    type: Schema.oneOfTypes([String, Number])
+                    type: Schema.oneOfTypes([String, Number]),
                 },
                 age: {
-                    type: Number
-                }
+                    type: Number,
+                },
             });
 
             const schema = new Schema({
                 owner: {
-                    type: personSchema
-                }
+                    type: personSchema,
+                },
             });
 
             const testObject = {
                 owner: {
                     name: 'Mike',
-                    age: 20
-                }
+                    age: 20,
+                },
             };
 
             const testObject2 = {
                 owner: {
                     name: 123,
-                    age: 22
-                }
+                    age: 22,
+                },
             };
 
             const testObject3 = {
                 owner: {
                     name: {
-                        first: 'Mike'
+                        first: 'Mike',
                     },
-                    age: 'test'
-                }
+                    age: 'test',
+                },
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -224,15 +224,15 @@ describe('Schema', () => {
         it('should validate array of String', () => {
             const schema = new Schema({
                 companyNames: {
-                    type: [String]
-                }
+                    type: [String],
+                },
             });
             const testObject = {
-                companyNames: ['Test Company', 'Test Company']
+                companyNames: ['Test Company', 'Test Company'],
             };
 
             const testObject2 = {
-                companyNames: ['test', 2345]
+                companyNames: ['test', 2345],
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -244,16 +244,16 @@ describe('Schema', () => {
         it('should validate array of Number', () => {
             const schema = new Schema({
                 companyNumbers: {
-                    type: [Number]
-                }
+                    type: [Number],
+                },
             });
 
             const testObject = {
-                companyNumbers: [2345, 544556]
+                companyNumbers: [2345, 544556],
             };
 
             const testObject2 = {
-                companyNumbers: ['Test Company', 212]
+                companyNumbers: ['Test Company', 212],
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -265,16 +265,16 @@ describe('Schema', () => {
         it('should validate array of Boolean', () => {
             const schema = new Schema({
                 isActive: {
-                    type: [Boolean]
-                }
+                    type: [Boolean],
+                },
             });
 
             const testObject = {
-                isActive: [true, false, true, true]
+                isActive: [true, false, true, true],
             };
 
             const testObject2 = {
-                isActive: ['test', true, 'test2']
+                isActive: ['test', true, 'test2'],
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -286,25 +286,25 @@ describe('Schema', () => {
         it('should validate array of Object', () => {
             const schema = new Schema({
                 data: {
-                    type: [Object]
-                }
+                    type: [Object],
+                },
             });
 
             const testObject = {
                 data: [
                     {
                         title: 'title description',
-                        description: 'test description'
+                        description: 'test description',
                     },
                     {
                         title: 'title description2',
-                        description: 'test description2'
-                    }
-                ]
+                        description: 'test description2',
+                    },
+                ],
             };
 
             const testObject2 = {
-                data: ['test', 'test2']
+                data: ['test', 'test2'],
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -316,16 +316,16 @@ describe('Schema', () => {
         it('should validate array of Date', () => {
             const schema = new Schema({
                 dates: {
-                    type: [Date]
-                }
+                    type: [Date],
+                },
             });
 
             const testObject = {
-                dates: [new Date('2017-01-01'), new Date('2017-01-02')]
+                dates: [new Date('2017-01-01'), new Date('2017-01-02')],
             };
 
             const testObject2 = {
-                dates: ['2017-01-01', '2017-01-02']
+                dates: ['2017-01-01', '2017-01-02'],
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -337,16 +337,16 @@ describe('Schema', () => {
         it('should validate array of Array', () => {
             const schema = new Schema({
                 names: {
-                    type: [Array]
-                }
+                    type: [Array],
+                },
             });
 
             const testObject = {
-                names: [['Mike','Nicolas'],['Mike2','Nicolas2']]
+                names: [['Mike', 'Nicolas'], ['Mike2', 'Nicolas2']],
             };
 
             const testObject2 = {
-                names: ['Mike, Nicolas', 'Mike2, Nicolas2']
+                names: ['Mike, Nicolas', 'Mike2, Nicolas2'],
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -358,51 +358,51 @@ describe('Schema', () => {
         it('should validate array of Schema', () => {
             const personSchema = new Schema({
                 name: {
-                    type: String
+                    type: String,
                 },
                 age: {
-                    type: Number
-                }
+                    type: Number,
+                },
             });
 
             const schema = new Schema({
                 owners: {
-                    type: [personSchema]
-                }
+                    type: [personSchema],
+                },
             });
 
             const testObject = {
                 owners: [
                     {
                         name: 'Mike',
-                        age: 20
+                        age: 20,
                     },
                     {
                         name: 'Mike2',
-                        age: 21
-                    }
-                ]
+                        age: 21,
+                    },
+                ],
             };
 
             const testObject2 = {
                 owners: [
                     {
                         name: 'Mike',
-                        age: 20
+                        age: 20,
                     },
                     {
                         name: 123,
-                        age: 'test'
+                        age: 'test',
                     },
                     {
                         name: 'Mike',
-                        age: 20
+                        age: 20,
                     },
                     {
                         name: 323,
-                        age: 'test2'
-                    }
-                ]
+                        age: 'test2',
+                    },
+                ],
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -417,74 +417,74 @@ describe('Schema', () => {
         it('should validate array of OneOfTypes', () => {
             const personSchema = new Schema({
                 name: {
-                    type: Schema.oneOfTypes([String, Number])
+                    type: Schema.oneOfTypes([String, Number]),
                 },
                 age: {
-                    type: Number
-                }
+                    type: Number,
+                },
             });
 
             const schema = new Schema({
                 owners: {
-                    type: [personSchema]
-                }
+                    type: [personSchema],
+                },
             });
 
             const testObject = {
                 owners: [
                     {
                         name: 'Mike',
-                        age: 20
+                        age: 20,
                     },
                     {
                         name: 'Mike2',
-                        age: 21
-                    }
-                ]
+                        age: 21,
+                    },
+                ],
             };
 
             const testObject2 = {
                 owners: [
                     {
                         name: 'Mike',
-                        age: 20
+                        age: 20,
                     },
                     {
                         name: 123,
-                        age: 22
+                        age: 22,
                     },
                     {
                         name: 'Mike',
-                        age: 20
+                        age: 20,
                     },
                     {
                         name: 323,
-                        age: 12
-                    }
-                ]
+                        age: 12,
+                    },
+                ],
             };
 
             const testObject3 = {
                 owners: [
                     {
                         name: {
-                            first: 'Mike'
+                            first: 'Mike',
                         },
-                        age: 20
+                        age: 20,
                     },
                     {
                         name: 123,
-                        age: 'test'
+                        age: 'test',
                     },
                     {
                         name: 'Mike',
-                        age: 20
+                        age: 20,
                     },
                     {
                         name: 323,
-                        age: 'test2'
-                    }
-                ]
+                        age: 'test2',
+                    },
+                ],
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -501,16 +501,16 @@ describe('Schema', () => {
         const schema = new Schema({
             termsAccepted: {
                 type: Boolean,
-                required: true
-            }
+                required: true,
+            },
         });
 
         const testObject = {
-            termsAccepted: true
+            termsAccepted: true,
         };
 
         const testObject2 = {
-            termsAccepted: false
+            termsAccepted: false,
         };
 
         const testObjectErrors = schema.validate(testObject);
@@ -522,33 +522,33 @@ describe('Schema', () => {
         jest.useFakeTimers();
 
         it('sync', () => {
-            const minLength = (length, message) => ({
+            const minLength = length => ({
                 validator(value) {
                     return value.length >= length;
                 },
-                errorMessage: `Min length ${length}`
+                errorMessage: `Min length ${length}`,
             });
-            const maxLength = (length, message) => ({
+            const maxLength = length => ({
                 validator(value) {
                     return value.length <= length;
                 },
-                errorMessage: `Max length ${length}`
+                errorMessage: `Max length ${length}`,
             });
 
             const schema = new Schema({
                 companyName: {
                     type: String,
                     required: true,
-                    validators: [minLength(3), maxLength(20)]
-                }
+                    validators: [minLength(3), maxLength(20)],
+                },
             });
 
             const testObject = {
-                companyName: 'test company'
+                companyName: 'test company',
             };
 
             const testObject2 = {
-                companyName: 't1'
+                companyName: 't1',
             };
 
             const testObjectErrors = schema.validate(testObject);
@@ -564,27 +564,27 @@ describe('Schema', () => {
                     return new Promise((resolve) => {
                         setTimeout(() => {
                             resolve(value === 'test company');
-                        },100);
+                        }, 100);
                     });
                 },
-                errorMessage: `async validation failed`
+                errorMessage: 'async validation failed',
             });
 
             const schema = new Schema({
                 companyName: {
                     type: String,
                     required: true,
-                    validators: [asyncValidator()]
-                }
+                    validators: [asyncValidator()],
+                },
             });
 
             const testObject = {
-                companyName: 'test company2'
+                companyName: 'test company2',
             };
 
             const testObjectErrors = schema.validate(testObject);
             jest.runOnlyPendingTimers();
-            if(testObjectErrors instanceof Promise) {
+            if (testObjectErrors instanceof Promise) {
                 testObjectErrors.then((results) => {
                     expect(Object.keys(results).length).toBe(1);
                     done();
@@ -598,27 +598,27 @@ describe('Schema', () => {
                     return new Promise((resolve) => {
                         setTimeout(() => {
                             resolve(value === 'test company2');
-                        },100);
+                        }, 100);
                     });
                 },
-                errorMessage: `async validation failed`
+                errorMessage: 'async validation failed',
             });
 
             const schema = new Schema({
                 companyName: {
                     type: String,
                     required: true,
-                    validators: [asyncValidator()]
-                }
+                    validators: [asyncValidator()],
+                },
             });
 
             const testObject = {
-                companyName: 'test company2'
+                companyName: 'test company2',
             };
 
             const testObjectErrors = schema.validate(testObject);
             jest.runOnlyPendingTimers();
-            if(testObjectErrors instanceof Promise) {
+            if (testObjectErrors instanceof Promise) {
                 testObjectErrors.then((results) => {
                     expect(Object.keys(results).length).toBe(0);
                     done();
@@ -629,13 +629,13 @@ describe('Schema', () => {
         it('should be able to return multiple errorMessages in an array from validator', () => {
             const errorMessages = ['bar', 'biz'];
             const validatorObject = {
-                validator: () => errorMessages
+                validator: () => errorMessages,
             };
             const schema = new Schema({
                 foo: {
                     type: String,
-                    validators: [validatorObject]
-                }
+                    validators: [validatorObject],
+                },
             });
             const results = schema.validate({ foo: 'foo' });
             expect(results.foo).toEqual(errorMessages);
@@ -644,25 +644,24 @@ describe('Schema', () => {
         it('should be able to return single errorMessage from validator', () => {
             const errorMessage = 'bar';
             const validatorObject = {
-                validator: () => errorMessage
+                validator: () => errorMessage,
             };
             const schema = new Schema({
                 foo: {
                     type: String,
-                    validators: [validatorObject]
-                }
+                    validators: [validatorObject],
+                },
             });
             const results = schema.validate({ foo: 'foo' });
             expect(results.foo).toEqual([errorMessage]);
         });
-
     });
 
     it('should return model error if model is undefined', () => {
         const schema = new Schema({
             companyName: {
-                type: String
-            }
+                type: String,
+            },
         });
 
         const testObjectErrors = schema.validate();
@@ -672,13 +671,13 @@ describe('Schema', () => {
     it('should return error if model has keys not defined in schema', () => {
         const schema = new Schema({
             companyName: {
-                type: String
-            }
+                type: String,
+            },
         });
 
         const testObject = {
             companyName: 'Test company',
-            companyNumber: 1223123
+            companyNumber: 1223123,
         };
 
         const testObjectErrors = schema.validate(testObject);
@@ -688,57 +687,57 @@ describe('Schema', () => {
     it('should get default values for model', () => {
         const personSchema = new Schema({
             name: {
-                type: String
+                type: String,
             },
             country: {
                 type: String,
-                defaultValue: 'POLAND'
-            }
+                defaultValue: 'POLAND',
+            },
         });
 
         const schema = new Schema({
             companyName: {
-                type: String
+                type: String,
             },
             age: {
-                type: Number
+                type: Number,
             },
             isActive: {
-                type: Boolean
+                type: Boolean,
             },
             category: {
                 type: String,
                 options: [
                     'test',
-                    'test2'
-                ]
+                    'test2',
+                ],
             },
             language: {
                 type: String,
                 options: [
                     {
                         label: 'Polish - PL',
-                        value: 'polish'
+                        value: 'polish',
                     },
                     {
                         label: 'English - EN',
-                        value: 'english'
-                    }
-                ]
+                        value: 'english',
+                    },
+                ],
             },
             currency: {
                 type: String,
-                defaultValue: 'EUR'
+                defaultValue: 'EUR',
             },
             person: {
-                type: personSchema
+                type: personSchema,
             },
             members: {
-                type: [personSchema]
+                type: [personSchema],
             },
             data: {
-                type: Object
-            }
+                type: Object,
+            },
         });
         const defaultModelValues = schema.getDefaultValues();
         expect(defaultModelValues.companyName).toBe('');
@@ -756,19 +755,19 @@ describe('Schema', () => {
 
     it('should throw error if type is unrecognized', () => {
         const test = {
-            test1: String
+            test1: String,
         };
         const schema = new Schema({
             test: {
                 type: test,
-                required: true
-            }
+                required: true,
+            },
         });
 
         const testObject = {
             test: {
-                test1: 'some data'
-            }
+                test1: 'some data',
+            },
         };
 
         try {
@@ -781,25 +780,25 @@ describe('Schema', () => {
     it('should get defined schema', () => {
         const schemaObject = {
             companyName: {
-                type: String
+                type: String,
             },
             age: {
-                type: Number
+                type: Number,
             },
             isActive: {
-                type: Boolean
+                type: Boolean,
             },
             category: {
                 type: String,
                 options: [
                     'test',
-                    'test2'
-                ]
+                    'test2',
+                ],
             },
             currency: {
                 type: String,
-                defaultValue: 'EUR'
-            }
+                defaultValue: 'EUR',
+            },
         };
         const schema = new Schema(schemaObject);
 
@@ -809,25 +808,25 @@ describe('Schema', () => {
     it('should dont validate keys not defined in schema', () => {
         const schemaObject = {
             companyName: {
-                type: String
+                type: String,
             },
             age: {
-                type: Number
+                type: Number,
             },
             isActive: {
-                type: Boolean
+                type: Boolean,
             },
             category: {
                 type: String,
                 options: [
                     'test',
-                    'test2'
-                ]
+                    'test2',
+                ],
             },
             currency: {
                 type: String,
-                defaultValue: 'EUR'
-            }
+                defaultValue: 'EUR',
+            },
         };
         const normalSchema = new Schema(schemaObject);
         const dontValidateKeysSchema = new Schema(schemaObject, false, false);
@@ -838,7 +837,7 @@ describe('Schema', () => {
             isActive: true,
             category: 'test',
             currency: 'PLN',
-            _id: 'test1234567890'
+            _id: 'test1234567890',
         };
 
         const errors = normalSchema.validate(data);
@@ -846,5 +845,98 @@ describe('Schema', () => {
 
         expect(Object.keys(errors).length).toBe(1);
         expect(Object.keys(errors2).length).toBe(0);
+    });
+
+    it('should pick fields from schema', () => {
+        const schema = new Schema({
+            foo: {
+                type: String,
+            },
+            foo2: {
+                type: Number,
+            },
+            bar: {
+                type: Boolean,
+            },
+            bar2: {
+                type: String,
+            },
+        });
+
+        expect(schema.pick(['foo', 'bar'])).toEqual({
+            foo: {
+                type: String,
+            },
+            bar: {
+                type: Boolean,
+            },
+        });
+    });
+
+    it('should get fields from schema and omit some fields', () => {
+        const schema = new Schema({
+            foo: {
+                type: String,
+            },
+            foo2: {
+                type: Number,
+            },
+            bar: {
+                type: Boolean,
+            },
+            bar2: {
+                type: String,
+            },
+        });
+
+        expect(schema.omit(['foo', 'bar'])).toEqual({
+            foo2: {
+                type: Number,
+            },
+            bar2: {
+                type: String,
+            },
+        });
+    });
+
+    it('should extend schema', () => {
+        const schema = new Schema({
+            foo: {
+                type: String,
+            },
+            foo2: {
+                type: Number,
+            },
+            bar: {
+                type: Boolean,
+            },
+            bar2: {
+                type: String,
+            },
+        });
+
+        schema.extend({
+            foo3: {
+                type: String,
+            },
+        });
+
+        expect(schema.getFields()).toEqual({
+            foo: {
+                type: String,
+            },
+            foo2: {
+                type: Number,
+            },
+            bar: {
+                type: Boolean,
+            },
+            bar2: {
+                type: String,
+            },
+            foo3: {
+                type: String,
+            },
+        });
     });
 });

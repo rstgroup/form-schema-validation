@@ -1,4 +1,10 @@
-import { pick, difference } from './helpers';
+import {
+    pick,
+    difference,
+    getDefaultValueForType,
+    getDefaultValueFromOptions,
+    wrapToArray,
+} from './helpers';
 import OneOfTypes from './oneOfTypes';
 
 const defaultMessages = {
@@ -10,10 +16,14 @@ const defaultMessages = {
     validateObject(key) { return `Field '${key}' is not a Object`; },
     validateArray(key) { return `Field '${key}' is not a Array`; },
     validateBoolean(key) { return `Field '${key}' is not a Boolean`; },
-    validateDate(key) { return `Field '${key}' is not a Date`; }
+    validateDate(key) { return `Field '${key}' is not a Date`; },
 };
 
 class Schema {
+    static oneOfTypes(types) {
+        return new OneOfTypes(types);
+    }
+
     constructor(schema, messages, validateKeys = true) {
         this.schema = schema;
         this.errors = {};
@@ -39,50 +49,33 @@ class Schema {
         };
     }
 
-    static oneOfTypes(types) {
-        return new OneOfTypes(types);
-    }
-
-    getDefaultValueForModel(value, wrrapArray) {
-        return wrrapArray ? [value] : value;
-    }
-
     getDefaultValues() {
         const fieldsKeys = Object.keys(this.schema);
         const model = {};
         fieldsKeys.forEach((key) => {
             const field = this.getField(key);
             const isArrayOfType = Array.isArray(field.type);
-            const fieldType = isArrayOfType? field.type[0] : field.type;
+            const fieldType = isArrayOfType ? field.type[0] : field.type;
 
             if (field.defaultValue) {
-                model[key] = this.getDefaultValueForModel(field.defaultValue, isArrayOfType);
+                model[key] = wrapToArray(field.defaultValue, isArrayOfType);
                 return;
             }
             if (field.options) {
-                model[key] = this.getDefaultValueForModel(
-                    field.options[0].label ? field.options[0].value : field.options[0],
-                    isArrayOfType
+                model[key] = wrapToArray(
+                    getDefaultValueFromOptions(field.options),
+                    isArrayOfType,
                 );
                 return;
             }
             if (fieldType instanceof Schema) {
-                model[key] = this.getDefaultValueForModel(fieldType.getDefaultValues(), isArrayOfType);
+                model[key] = wrapToArray(
+                    fieldType.getDefaultValues(),
+                    isArrayOfType,
+                );
                 return;
             }
-            if (fieldType.name === 'Number') {
-                model[key] = this.getDefaultValueForModel(NaN, isArrayOfType);
-                return;
-            }
-            if (fieldType.name === 'Boolean') {
-                model[key] = this.getDefaultValueForModel(false, isArrayOfType);
-                return;
-            }
-            if (fieldType.name === 'Object') {
-                model[key] = this.getDefaultValueForModel({}, isArrayOfType);
-                return;
-            }
-            model[key] = this.getDefaultValueForModel('', isArrayOfType);
+            model[key] = getDefaultValueForType(fieldType, isArrayOfType);
         });
         return model;
     }
@@ -98,11 +91,11 @@ class Schema {
     validate(model) {
         this.errors = {};
         this.promises = [];
-        if(this.checkModel(model)) {
+        if (this.checkModel(model)) {
             this.checkKeysDiff(model);
             this.checkTypesAndValidators(model);
         }
-        if(this.promises.length > 0) {
+        if (this.promises.length > 0) {
             return new Promise((resolve) => {
                 Promise
                     .all(this.promises)
@@ -122,7 +115,7 @@ class Schema {
     }
 
     checkModel(model) {
-        if(!model) {
+        if (!model) {
             this.setError('model', this.messages.modelIsUndefined());
             return false;
         }
@@ -130,12 +123,12 @@ class Schema {
     }
 
     checkKeysDiff(model) {
-        if (!this.validateKeys) return true;
+        if (!this.validateKeys) return;
         const modelKeys = Object.keys(model);
         const schemaKeys = Object.keys(this.schema);
         const keysDiff = difference(modelKeys, schemaKeys);
         if (keysDiff.length > 0) {
-            keysDiff.forEach(key => {
+            keysDiff.forEach((key) => {
                 this.setError(key, this.messages.notDefinedKey(key));
             });
         }
@@ -149,7 +142,7 @@ class Schema {
             const fieldSchema = this.schema[key];
             const isArrayOfType = Array.isArray(fieldSchema.type);
             const fieldType = isArrayOfType ? fieldSchema.type[0] : fieldSchema.type;
-            if (isArrayOfType && this.validateType(Array, value)){
+            if (isArrayOfType && this.validateType(Array, value)) {
                 value.forEach((item, index) => {
                     this.validateType(fieldType, item, key, index);
                 });
@@ -162,9 +155,9 @@ class Schema {
                 value,
                 fieldSchema,
                 validatedObject,
-                key
+                key,
             });
-        })
+        });
     }
 
     resolveValidatorErrorsForKey(key, errorMessage, results) {
@@ -187,11 +180,11 @@ class Schema {
         if (!validators) {
             return;
         }
-        validators.forEach(({validator, errorMessage}) => {
+        validators.forEach(({ validator, errorMessage }) => {
             const results = validator(value, fieldSchema, validatedObject);
             if (results instanceof Promise) {
-                const promise = results.then((results) => {
-                    this.resolveValidatorErrorsForKey(key, errorMessage, results);
+                const promise = results.then((result) => {
+                    this.resolveValidatorErrorsForKey(key, errorMessage, result);
                 });
                 this.promises.push(promise);
                 return;
@@ -211,7 +204,7 @@ class Schema {
             return this.typesValidators[type.name](value, key, type, index);
         }
         if (type instanceof Schema) {
-            return this.validateTypeSchema(value, key, type, index)
+            return this.validateTypeSchema(value, key, type, index);
         }
         if (type instanceof OneOfTypes) {
             return this.validateOneOfTypes(value, key, type, index);
@@ -244,13 +237,13 @@ class Schema {
     }
 
     validateTypeBoolean(value, key, index) {
-        if(typeof value === 'boolean') return true;
+        if (typeof value === 'boolean') return true;
         this.setError(key, this.messages.validateBoolean(key), index);
         return false;
     }
 
     validateTypeDate(value, key, index) {
-        if(value instanceof Date) return true;
+        if (value instanceof Date) return true;
         this.setError(key, this.messages.validateDate(key), index);
         return false;
     }
@@ -270,6 +263,31 @@ class Schema {
         if (keys.length < type.getTypes().length) return true;
         this.setError(key, errors, index);
         return false;
+    }
+
+    pick(fieldsToPick) {
+        const fields = {};
+        fieldsToPick.forEach((fieldName) => {
+            fields[fieldName] = this.schema[fieldName];
+        });
+        return fields;
+    }
+
+    omit(fieldsToOmit) {
+        const fields = {};
+        Object.keys(this.schema).forEach((fieldName) => {
+            if (fieldsToOmit.indexOf(fieldName) > -1) {
+                return;
+            }
+            fields[fieldName] = this.schema[fieldName];
+        });
+        return fields;
+    }
+
+    extend(fieldsToExtend) {
+        Object.keys(fieldsToExtend).forEach((fieldName) => {
+            this.schema[fieldName] = fieldsToExtend[fieldName];
+        });
     }
 }
 

@@ -2,17 +2,20 @@
   "name": "form-schema-validation",
   "version": "1.7.1",
   "description": "Schema for form validation",
-  "main": "lib/index.js",
+  "main": "dist/index.js",
   "jsnext:main": "src/index.js",
   "repository": "https://github.com/mprzodala/form-schema-validation",
   "homepage": "https://github.com/mprzodala/form-schema-validation",
   "license": "MIT",
   "scripts": {
-    "test": "jest",
-    "build": "webpack -p --config webpack.config.js",
-    "prepublish": "npm run build",
+    "test": "jest && npm run lint",
+    "test:watch": "jest --watch",
+    "build": "rm -rf ./dist && webpack -p --config webpack.config.js",
+    "prepublish": "npm run test && npm run build",
     "coverage": "jest --coverage",
-    "coverage:report": "cat ./coverage/lcov.info | coveralls"
+    "coverage:report": "cat ./coverage/lcov.info | coveralls",
+    "lint": "eslint -c .eslintrc.json src/*.js",
+    "lint:fix": "eslint --fix -c .eslintrc.json src/*.js"
   },
   "keywords": [
     "schema",
@@ -36,6 +39,11 @@
     "babel-preset-es2015-native-modules": "^6.9.4",
     "babel-preset-stage-0": "^6.16.0",
     "coveralls": "^2.13.1",
+    "eslint": "^4.5.0",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^5.1.1",
+    "eslint-plugin-react": "^7.3.0",
     "jest": "^18.1.0",
     "webpack": "^2.2.0"
   },

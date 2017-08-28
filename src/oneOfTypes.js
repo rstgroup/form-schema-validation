@@ -17,8 +17,8 @@ class OneOfTypes {
         this.getTypes().forEach((type, key) => {
             schema[`type${key}`] = {
                 type,
-                required: true
-            }
+                required: true,
+            };
         });
         return schema;
     }
