@@ -97,6 +97,9 @@ results.then((errors) => {
 | getField | name: String | Get field schema |
 | getField |  | Get all fields schemas |
 | oneOfTypes | types: Array of types | Give posibility to validate one of type (Static method) |
+| pick | fieldsToPick: [String] | get fields from schema by keys |
+| omit | fieldsToOmit: [String] | get fields from schema and omit fieldsToOmit |
+| extend | fieldsToExtend: [String] | extend schema by new fields or overwrite them |
 
 ### Types
 
@@ -281,3 +284,4 @@ const errors = schema.validate(modelObject);
 console.log(Object.keys(errors).length > 0); // false
 
 ```
+
