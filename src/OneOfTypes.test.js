@@ -1,4 +1,4 @@
-import OneOfTypes from './oneOfTypes';
+import OneOfTypes from './OneOfTypes';
 
 describe('OneOfTypes', () => {
     it('getTypes should return array with 2 types', () => {

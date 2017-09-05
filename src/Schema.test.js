@@ -1,4 +1,5 @@
-import Schema from './index';
+import Schema from './Schema';
+import SchemaType from './SchemaType';
 
 describe('Schema', () => {
     describe('Validation types', () => {
@@ -497,28 +498,138 @@ describe('Schema', () => {
         });
     });
 
-    it('should validate required', () => {
-        const schema = new Schema({
-            termsAccepted: {
-                type: Boolean,
-                required: true,
-            },
+    describe('Validate required', () => {
+        it('should validate required String', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Boolean,
+                    required: true,
+                },
+            });
+            const modelWithoutErrors = {
+                foo: true,
+            };
+            const modelWithErrors = {
+                foo: false,
+            };
+
+            const testObjectErrors = schema.validate(modelWithoutErrors);
+            const testObject2Errors = schema.validate(modelWithErrors);
+            expect(Object.keys(testObjectErrors).length).toBe(0);
+            expect(Object.keys(testObject2Errors).length).toBe(1);
         });
 
-        const testObject = {
-            termsAccepted: true,
-        };
+        it('should validate required Number', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Number,
+                    required: true,
+                },
+            });
+            const modelWithoutErrors = {
+                foo: 0,
+            };
+            const modelWithErrors = {
+                foo: NaN,
+            };
 
-        const testObject2 = {
-            termsAccepted: false,
-        };
+            const testObjectErrors = schema.validate(modelWithoutErrors);
+            const testObject2Errors = schema.validate(modelWithErrors);
+            expect(Object.keys(testObjectErrors).length).toBe(0);
+            expect(Object.keys(testObject2Errors).length).toBe(1);
+        });
 
-        const testObjectErrors = schema.validate(testObject);
-        const testObject2Errors = schema.validate(testObject2);
-        expect(Object.keys(testObjectErrors).length).toBe(0);
-        expect(Object.keys(testObject2Errors).length).toBe(1);
+        it('should validate required Object', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Object,
+                    required: true,
+                },
+            });
+            const modelWithoutErrors = {
+                foo: { bar: 'foo' },
+            };
+            const modelWithErrors = {
+                foo: {},
+            };
+            const modelWithErrors2 = {
+                foo: ['bar'],
+            };
+
+            const testObjectErrors = schema.validate(modelWithoutErrors);
+            const testObject2Errors = schema.validate(modelWithErrors);
+            const testObject3Errors = schema.validate(modelWithErrors2);
+            expect(Object.keys(testObjectErrors).length).toBe(0);
+            expect(Object.keys(testObject2Errors).length).toBe(1);
+            expect(Object.keys(testObject3Errors).length).toBe(1);
+        });
+
+        it('should validate required Array', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Array,
+                    required: true,
+                },
+            });
+            const modelWithoutErrors = {
+                foo: ['bar'],
+            };
+            const modelWithErrors = {
+                foo: [],
+            };
+            const modelWithErrors2 = {
+                foo: { bar: 'foo' },
+            };
+
+            const testObjectErrors = schema.validate(modelWithoutErrors);
+            const testObject2Errors = schema.validate(modelWithErrors);
+            const testObject3Errors = schema.validate(modelWithErrors2);
+            expect(Object.keys(testObjectErrors).length).toBe(0);
+            expect(Object.keys(testObject2Errors).length).toBe(1);
+            expect(Object.keys(testObject3Errors).length).toBe(1);
+        });
+
+        it('should validate required Date', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Date,
+                    required: true,
+                },
+            });
+            const modelWithoutErrors = {
+                foo: new Date(),
+            };
+            const modelWithErrors = {
+                foo: {},
+            };
+
+            const testObjectErrors = schema.validate(modelWithoutErrors);
+            const testObject2Errors = schema.validate(modelWithErrors);
+            expect(Object.keys(testObjectErrors).length).toBe(0);
+            expect(Object.keys(testObject2Errors).length).toBe(1);
+        });
+
+        it('should validate required Boolean', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Boolean,
+                    required: true,
+                },
+            });
+            const modelWithoutErrors = {
+                foo: true,
+            };
+            const modelWithErrors = {
+                foo: false,
+            };
+
+            const testObjectErrors = schema.validate(modelWithoutErrors);
+            const testObject2Errors = schema.validate(modelWithErrors);
+            expect(Object.keys(testObjectErrors).length).toBe(0);
+            expect(Object.keys(testObject2Errors).length).toBe(1);
+        });
     });
-    describe('should validate using custom validators', () => {
+    describe('Should validate using custom validators', () => {
         jest.useFakeTimers();
 
         it('sync', () => {
@@ -937,6 +1048,150 @@ describe('Schema', () => {
             foo3: {
                 type: String,
             },
+        });
+    });
+
+    describe('Custom schema types', () => {
+        let fooType = {};
+        beforeEach(() => {
+            fooType = new SchemaType('Foo', {
+                getDefaultValue() {
+                    return 'foo';
+                },
+                validator(value, key) {
+                    if (value.indexOf('foo') > -1 || value === '') {
+                        return true;
+                    }
+                    this.setError(key, 'foo error');
+                    return false;
+                },
+                requiredValidator(value, key) {
+                    if (value.indexOf('foo') > -1) {
+                        return true;
+                    }
+                    this.setError(key, 'foo required');
+                    return false;
+                },
+            });
+        });
+
+        it('should register new schema type', () => {
+            const schema = new Schema({
+                foo: {
+                    type: fooType,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            schema.registerType(fooType);
+            expect(typeof schema.typesValidators.Foo).toBe('function');
+            expect(typeof schema.typesRequiredValidators.Foo).toBe('function');
+        });
+
+        it('should validate new schema type', () => {
+            const schema = new Schema({
+                foo: {
+                    type: fooType,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            schema.registerType(fooType);
+
+            const modelWithErrors = {
+                foo: 'test',
+                bar: '',
+            };
+            const modelWithoutErros = {
+                foo: '',
+                bar: '',
+            };
+            const modelWithoutErros2 = {
+                foo: 'foo',
+                bar: '',
+            };
+
+            expect(schema.validate(modelWithErrors)).toEqual({ foo: ['foo error'] });
+            expect(schema.validate(modelWithoutErros)).toEqual({});
+            expect(schema.validate(modelWithoutErros2)).toEqual({});
+        });
+
+        it('should validate new schema type when required', () => {
+            const schema = new Schema({
+                foo: {
+                    type: fooType,
+                    required: true,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            schema.registerType(fooType);
+
+            const modelWithErrors = {
+                foo: '',
+                bar: '',
+            };
+            const modelWithoutErros = {
+                foo: 'foo',
+                bar: '',
+            };
+
+            expect(schema.validate(modelWithErrors)).toEqual({ foo: ['foo required'] });
+            expect(schema.validate(modelWithoutErros)).toEqual({});
+        });
+
+        it('should use requiredValidatorType if new schema type dont have defined requiredValidator', () => {
+            fooType.requiredValidator = undefined;
+            const schema = new Schema({
+                foo: {
+                    type: fooType,
+                    required: true,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            schema.registerType(fooType);
+
+            const modelWithErrors = {
+                foo: '',
+                bar: '',
+            };
+            const modelWithErrors2 = {
+                foo: 'bar',
+                bar: '',
+            };
+            const modelWithoutErros = {
+                foo: 'foo',
+                bar: '',
+            };
+
+            expect(schema.validate(modelWithErrors)).toEqual({ foo: [schema.messages.validateRequired('foo')] });
+            expect(schema.validate(modelWithErrors2)).toEqual({ foo: ['foo error'] });
+            expect(schema.validate(modelWithoutErros)).toEqual({});
+        });
+
+        it('should get default value for new schema type', () => {
+            const schema = new Schema({
+                foo: {
+                    type: fooType,
+                    required: true,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            schema.registerType(fooType);
+
+            expect(schema.getDefaultValues()).toEqual({ foo: 'foo', bar: '' });
         });
     });
 });

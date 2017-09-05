@@ -20,6 +20,9 @@ export const wrapToArray = (value, shouldWrapToArray) => {
 };
 
 export const getDefaultValueForType = (type, isArrayOfType) => {
+    if (typeof type.getDefaultValue === 'function') {
+        return wrapToArray(type.getDefaultValue(), isArrayOfType);
+    }
     if (type === Number) {
         return wrapToArray(NaN, isArrayOfType);
     }
