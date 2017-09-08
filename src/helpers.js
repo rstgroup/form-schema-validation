@@ -26,6 +26,9 @@ export const getDefaultValueForType = (type, isArrayOfType) => {
     if (type === Number) {
         return wrapToArray(NaN, isArrayOfType);
     }
+    if (type === Date) {
+        return wrapToArray(new Date(), isArrayOfType);
+    }
     return wrapToArray(type(), isArrayOfType);
 };
 

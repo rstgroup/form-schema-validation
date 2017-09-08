@@ -8,15 +8,15 @@ import {
 import OneOfTypes from './OneOfTypes';
 
 const defaultMessages = {
-    notDefinedKey(key) { return `Key '${key}' is not defined in schema`; },
+    notDefinedKey(fieldName) { return `Key '${fieldName}' is not defined in schema`; },
     modelIsUndefined() { return 'Validated model is undefined'; },
-    validateRequired(key) { return `Field '${key}' is required`; },
-    validateString(key) { return `Field '${key}' is not a String`; },
-    validateNumber(key) { return `Field '${key}' is not a Number`; },
-    validateObject(key) { return `Field '${key}' is not a Object`; },
-    validateArray(key) { return `Field '${key}' is not a Array`; },
-    validateBoolean(key) { return `Field '${key}' is not a Boolean`; },
-    validateDate(key) { return `Field '${key}' is not a Date`; },
+    validateRequired(fieldName) { return `Field '${fieldName}' is required`; },
+    validateString(fieldName) { return `Field '${fieldName}' is not a String`; },
+    validateNumber(fieldName) { return `Field '${fieldName}' is not a Number`; },
+    validateObject(fieldName) { return `Field '${fieldName}' is not a Object`; },
+    validateArray(fieldName) { return `Field '${fieldName}' is not a Array`; },
+    validateBoolean(fieldName) { return `Field '${fieldName}' is not a Boolean`; },
+    validateDate(fieldName) { return `Field '${fieldName}' is not a Date`; },
 };
 
 class Schema {
@@ -267,37 +267,43 @@ class Schema {
 
     validateTypeString(value, key, index) {
         if (typeof value === 'string') return true;
-        this.setError(key, this.messages.validateString(key), index);
+        const { label } = this.getField(key);
+        this.setError(key, this.messages.validateString(label || key), index);
         return false;
     }
 
     validateTypeNumber(value, key, index) {
         if (typeof value === 'number') return true;
-        this.setError(key, this.messages.validateNumber(key), index);
+        const { label } = this.getField(key);
+        this.setError(key, this.messages.validateNumber(label || key), index);
         return false;
     }
 
     validateTypeObject(value, key, index) {
         if (typeof value === 'object' && !Array.isArray(value) && value !== null) return true;
-        this.setError(key, this.messages.validateObject(key), index);
+        const { label } = this.getField(key);
+        this.setError(key, this.messages.validateObject(label || key), index);
         return false;
     }
 
     validateTypeArray(value, key, index) {
         if (Array.isArray(value)) return true;
-        this.setError(key, this.messages.validateArray(key), index);
+        const { label } = this.getField(key);
+        this.setError(key, this.messages.validateArray(label || key), index);
         return false;
     }
 
     validateTypeBoolean(value, key, index) {
         if (typeof value === 'boolean') return true;
-        this.setError(key, this.messages.validateBoolean(key), index);
+        const { label } = this.getField(key);
+        this.setError(key, this.messages.validateBoolean(label || key), index);
         return false;
     }
 
     validateTypeDate(value, key, index) {
         if (value instanceof Date) return true;
-        this.setError(key, this.messages.validateDate(key), index);
+        const { label } = this.getField(key);
+        this.setError(key, this.messages.validateDate(label || key), index);
         return false;
     }
 

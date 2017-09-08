@@ -958,6 +958,31 @@ describe('Schema', () => {
         expect(Object.keys(errors2).length).toBe(0);
     });
 
+    it('should display label in error message if is defined in schema unless display key', () => {
+        const schemaObject = {
+            foo: {
+                type: String,
+                label: 'testLabel',
+            },
+            bar: {
+                type: String,
+            },
+        };
+        const schema = new Schema(schemaObject);
+
+        const data = {
+            foo: 10,
+            bar: 12,
+        };
+
+        const errors = schema.validate(data);
+
+        expect(errors).toEqual({
+            foo: ['Field \'testLabel\' is not a String'],
+            bar: ['Field \'bar\' is not a String'],
+        });
+    });
+
     it('should pick fields from schema', () => {
         const schema = new Schema({
             foo: {

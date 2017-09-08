@@ -37,16 +37,23 @@ describe('helpers', () => {
     });
 
     it('should get default value for type', () => {
-        const foo = Number;
-        const bar = String;
-        const foo3 = { getDefaultValue: () => 'bar' };
+        const number = Number;
+        const string = String;
+        const boolean = Boolean;
+        const date = Date;
+        const custom = { getDefaultValue: () => 'bar' };
 
-        expect(isNaN(getDefaultValueForType(foo))).toEqual(true);
-        expect(getDefaultValueForType(bar)).toEqual('');
-        expect(getDefaultValueForType(foo3)).toEqual('bar');
-        expect(isNaN(getDefaultValueForType(foo, true)[0])).toEqual(true);
-        expect(getDefaultValueForType(bar, true)).toEqual(['']);
-        expect(getDefaultValueForType(foo3, true)).toEqual(['bar']);
+        expect(isNaN(getDefaultValueForType(number))).toEqual(true);
+        expect(getDefaultValueForType(string)).toEqual('');
+        expect(getDefaultValueForType(boolean)).toEqual(false);
+        expect(getDefaultValueForType(custom)).toEqual('bar');
+        expect(getDefaultValueForType(date) instanceof Date).toEqual(true);
+
+        expect(isNaN(getDefaultValueForType(number, true)[0])).toEqual(true);
+        expect(getDefaultValueForType(string, true)).toEqual(['']);
+        expect(getDefaultValueForType(boolean, true)).toEqual([false]);
+        expect(getDefaultValueForType(custom, true)).toEqual(['bar']);
+        expect(getDefaultValueForType(date, true)[0] instanceof Date).toEqual(true);
     });
 
     it('should get default value from options', () => {
