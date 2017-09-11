@@ -113,7 +113,7 @@ results.then((errors) => {
 | Date | This type check value is instance of Date |
 | new Schema | This type check value is instance of Schema and validate value by this schema |
 | Schema.oneOfType([type1, type2, ...]) | This type give you posibility check one of types it will return error if value don't match all types |
-| SchemaType | You can register new schema type that has name, validator, validator when field is required (requiredValidator) and getDefault |
+| SchemaType | You can register new schema type that has name, validator, validator when field is required (requiredValidator) and getDefaultValue |
 
 #### Example of custom validator
 This validator will check two fields. You can validate one field on base another field.
