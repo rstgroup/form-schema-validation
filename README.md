@@ -100,6 +100,7 @@ results.then((errors) => {
 | pick | fieldsToPick: [String] | get fields from schema by keys |
 | omit | fieldsToOmit: [String] | get fields from schema and omit fieldsToOmit |
 | extend | fieldsToExtend: [String] | extend schema by new fields or overwrite them |
+| registerType | type: SchemaType | register new schema type |
 
 ### Types
 
@@ -112,7 +113,7 @@ results.then((errors) => {
 | Date | This type check value is instance of Date |
 | new Schema | This type check value is instance of Schema and validate value by this schema |
 | Schema.oneOfType([type1, type2, ...]) | This type give you posibility check one of types it will return error if value don't match all types |
-
+| SchemaType | You can register new schema type that has name, validator, validator when field is required (requiredValidator) and getDefault |
 
 #### Example of custom validator
 This validator will check two fields. You can validate one field on base another field.
@@ -214,6 +215,54 @@ const groupSchema = new Schema({
 });
 ```
 
+##### Example of use new schema type
+
+```js
+import Schema, { SchemaType } from 'form-schema-validation';
+
+const fooType = new SchemaType('Foo', {
+    getDefaultValue() {
+        return 'foo';
+    },
+    validator(value, key) {
+        if (value.indexOf('foo') > -1 || value === '') {
+            return true;
+        }
+        this.setError(key, 'foo error');
+        return false;
+    },
+    requiredValidator(value, key) {
+        if (value.indexOf('foo') > -1) {
+            return true;
+        }
+        this.setError(key, 'foo required');
+        return false;
+    },
+});
+
+const schema = new Schema({
+    foo: {
+        type: fooType,
+    },
+    bar: {
+        type: String,
+    },
+});
+
+const modelWithErrors = {
+    foo: 'test',
+    bar: '',
+};
+const modelWithoutErros = {
+    foo: '',
+    bar: '',
+};
+const modelWithoutErros2 = {
+    foo: 'foo',
+    bar: '',
+};
+```
+
 #### Schema keys description
 
 When You defined schema You can use this keys:
@@ -224,6 +273,7 @@ When You defined schema You can use this keys:
 | type | String, Number, Object, Date, Boolean, Array, instance of Schema, [String] ... | this key tell as what type of value we should have on this key in model |
 | required | true, false | this key tell as that field is required |
 | defaultValue | Any | You can set default value for model |
+| disableDefaultValue | Boolean | You can disable filed default value |
 | options | Array of (String, Number, Object, Date, ...) | If you use schema for forms You can defined options for select field |
 | label | Any instance of String | If you use schema for forms You can defined label for form field |
 | validators | array of Functions | You can add custom validators for validate field for example min or max length of value. |
