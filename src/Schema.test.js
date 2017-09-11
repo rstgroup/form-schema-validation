@@ -768,6 +768,116 @@ describe('Schema', () => {
         });
     });
 
+    describe('Default value', () => {
+        it('should get default value for String type', () => {
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                },
+            });
+            const defaultModel = schema.getDefaultValues();
+            expect(defaultModel).toEqual({ foo: '' });
+        });
+
+        it('should get default value for Number type', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Number,
+                },
+            });
+            const defaultModel = schema.getDefaultValues();
+            expect(defaultModel).toEqual({ foo: NaN });
+        });
+
+        it('should get default value for Boolean type', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Boolean,
+                },
+            });
+            const defaultModel = schema.getDefaultValues();
+            expect(defaultModel).toEqual({ foo: false });
+        });
+
+        it('should get default value for Object type', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Object,
+                },
+            });
+            const defaultModel = schema.getDefaultValues();
+            expect(defaultModel).toEqual({ foo: {} });
+        });
+
+        it('should get default value for Date type', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Date,
+                },
+            });
+            const defaultModel = schema.getDefaultValues();
+            expect(defaultModel.foo instanceof Date).toEqual(true);
+        });
+
+        it('should get default value for array of type', () => {
+            const schema = new Schema({
+                foo: {
+                    type: [String],
+                },
+            });
+            const defaultModel = schema.getDefaultValues();
+            expect(defaultModel).toEqual({ foo: [''] });
+        });
+
+        it('should get default for field with options', () => {
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                    options: ['foo1', 'foo2', 'foo3'],
+                },
+            });
+            const defaultModel = schema.getDefaultValues();
+            expect(defaultModel).toEqual({ foo: 'foo1' });
+        });
+
+        it('should get default value for schema type', () => {
+            const barSchema = new Schema({
+                foo: {
+                    type: String,
+                },
+                bar: {
+                    type: String,
+                    defaultValue: 'foo',
+                },
+            });
+
+            const fooSchema = new Schema({
+                bar: {
+                    type: barSchema,
+                },
+            });
+            const defaultModel = fooSchema.getDefaultValues();
+            expect(defaultModel).toEqual({
+                bar: {
+                    foo: '',
+                    bar: 'foo',
+                },
+            });
+        });
+
+        it('should not return default value if field has flag disableDefaultValue', () => {
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                    options: ['foo1', 'foo2', 'foo3'],
+                    disableDefaultValue: true,
+                },
+            });
+            const defaultModel = schema.getDefaultValues();
+            expect(defaultModel).toEqual({});
+        });
+    });
+
     it('should return model error if model is undefined', () => {
         const schema = new Schema({
             companyName: {
@@ -793,75 +903,6 @@ describe('Schema', () => {
 
         const testObjectErrors = schema.validate(testObject);
         expect(Object.keys(testObjectErrors).length).toBe(1);
-    });
-
-    it('should get default values for model', () => {
-        const personSchema = new Schema({
-            name: {
-                type: String,
-            },
-            country: {
-                type: String,
-                defaultValue: 'POLAND',
-            },
-        });
-
-        const schema = new Schema({
-            companyName: {
-                type: String,
-            },
-            age: {
-                type: Number,
-            },
-            isActive: {
-                type: Boolean,
-            },
-            category: {
-                type: String,
-                options: [
-                    'test',
-                    'test2',
-                ],
-            },
-            language: {
-                type: String,
-                options: [
-                    {
-                        label: 'Polish - PL',
-                        value: 'polish',
-                    },
-                    {
-                        label: 'English - EN',
-                        value: 'english',
-                    },
-                ],
-            },
-            currency: {
-                type: String,
-                defaultValue: 'EUR',
-            },
-            person: {
-                type: personSchema,
-            },
-            members: {
-                type: [personSchema],
-            },
-            data: {
-                type: Object,
-            },
-        });
-        const defaultModelValues = schema.getDefaultValues();
-        expect(defaultModelValues.companyName).toBe('');
-        expect(typeof defaultModelValues.age).toBe('number');
-        expect(defaultModelValues.isActive).toBe(false);
-        expect(defaultModelValues.category).toBe('test');
-        expect(defaultModelValues.language).toBe('polish');
-        expect(defaultModelValues.currency).toBe('EUR');
-        expect(defaultModelValues.person.name).toBe('');
-        expect(defaultModelValues.person.country).toBe('POLAND');
-        expect(defaultModelValues.members[0].name).toBe('');
-        expect(defaultModelValues.members[0].country).toBe('POLAND');
-        expect(defaultModelValues.data instanceof Object).toBe(true);
     });
 
     it('should throw error if type is unrecognized', () => {
@@ -1131,8 +1172,6 @@ describe('Schema', () => {
                     type: String,
                 },
             });
-
-            schema.registerType(fooType);
 
             const modelWithErrors = {
                 foo: 'test',

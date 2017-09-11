@@ -2,6 +2,7 @@ import {
     pick,
     difference,
     wrapToArray,
+    getFieldType,
     getDefaultValueForType,
     getDefaultValueFromOptions,
 } from './helpers';
@@ -69,5 +70,16 @@ describe('helpers', () => {
 
         expect(getDefaultValueFromOptions(options)).toEqual('test1');
         expect(getDefaultValueFromOptions(options2)).toEqual('1');
+    });
+
+    it('should get field type from field', () => {
+        const fooField = {
+            type: String,
+        };
+        const barField = {
+            type: [String],
+        };
+        expect(getFieldType(fooField)).toBe(String);
+        expect(getFieldType(barField)).toBe(String);
     });
 });

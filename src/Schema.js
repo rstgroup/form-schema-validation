@@ -1,11 +1,13 @@
 import {
     pick,
     difference,
+    getFieldType,
     getDefaultValueForType,
     getDefaultValueFromOptions,
     wrapToArray,
 } from './helpers';
 import OneOfTypes from './OneOfTypes';
+import SchemaType from './SchemaType';
 
 const defaultMessages = {
     notDefinedKey(fieldName) { return `Key '${fieldName}' is not defined in schema`; },
@@ -69,9 +71,11 @@ class Schema {
         fieldsKeys.forEach((key) => {
             const field = this.getField(key);
             const isArrayOfType = Array.isArray(field.type);
-            const fieldType = isArrayOfType ? field.type[0] : field.type;
-
-            if (field.defaultValue) {
+            const fieldType = getFieldType(field);
+            if (field.disableDefaultValue) {
+                return;
+            }
+            if (field.defaultValue !== undefined) {
                 model[key] = wrapToArray(field.defaultValue, isArrayOfType);
                 return;
             }
@@ -258,6 +262,9 @@ class Schema {
 
     validateType(type, value, key, index) {
         const { name: typeName } = type;
+        if (type instanceof SchemaType && typeof this.typesValidators[typeName] !== 'function') {
+            this.registerType(type);
+        }
         if (typeof this.typesValidators[typeName] === 'function') {
             return this.typesValidators[typeName](value, key, type, index);
         }

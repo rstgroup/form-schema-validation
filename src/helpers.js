@@ -15,8 +15,15 @@ export const difference = (keys, compareKeys) => {
 };
 
 export const wrapToArray = (value, shouldWrapToArray) => {
-    if (shouldWrapToArray) return [value];
+    if (shouldWrapToArray && !Array.isArray(value)) return [value];
     return value;
+};
+
+export const getFieldType = (field) => {
+    if (Array.isArray(field.type)) {
+        return field.type[0];
+    }
+    return field.type;
 };
 
 export const getDefaultValueForType = (type, isArrayOfType) => {
