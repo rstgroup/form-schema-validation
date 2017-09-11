@@ -220,7 +220,8 @@ class Schema {
 
     validateRequiredType(value, key) {
         if (!value || value.length === 0) {
-            this.setError(key, this.messages.validateRequired(key));
+            const { label } = this.getField(key);
+            this.setError(key, this.messages.validateRequired(label || key));
         }
     }
 
@@ -228,19 +229,22 @@ class Schema {
         if (typeof value === 'object' && Object.keys(value).length > 0) {
             return;
         }
-        this.setError(key, this.messages.validateRequired(key));
+        const { label } = this.getField(key);
+        this.setError(key, this.messages.validateRequired(label || key));
     }
 
     validateRequiredTypeArray(value, key) {
         if (Array.isArray(value) && value.length > 0) {
             return;
         }
-        this.setError(key, this.messages.validateRequired(key));
+        const { label } = this.getField(key);
+        this.setError(key, this.messages.validateRequired(label || key));
     }
 
     validateRequiredTypeNumber(value, key) {
         if (isNaN(value)) {
-            this.setError(key, this.messages.validateRequired(key));
+            const { label } = this.getField(key);
+            this.setError(key, this.messages.validateRequired(label || key));
         }
     }
 
@@ -248,7 +252,8 @@ class Schema {
         if (value instanceof Date) {
             return;
         }
-        this.setError(key, this.messages.validateRequired(key));
+        const { label } = this.getField(key);
+        this.setError(key, this.messages.validateRequired(label || key));
     }
 
     validateType(type, value, key, index) {

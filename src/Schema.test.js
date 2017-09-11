@@ -967,12 +967,18 @@ describe('Schema', () => {
             bar: {
                 type: String,
             },
+            requiredField: {
+                type: String,
+                required: true,
+                label: 'testLabel',
+            },
         };
         const schema = new Schema(schemaObject);
 
         const data = {
             foo: 10,
             bar: 12,
+            requiredField: '',
         };
 
         const errors = schema.validate(data);
@@ -980,6 +986,7 @@ describe('Schema', () => {
         expect(errors).toEqual({
             foo: ['Field \'testLabel\' is not a String'],
             bar: ['Field \'bar\' is not a String'],
+            requiredField: ['Field \'testLabel\' is required'],
         });
     });
 
