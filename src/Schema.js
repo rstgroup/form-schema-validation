@@ -114,11 +114,7 @@ class Schema {
             this.checkTypesAndValidators(model);
         }
         if (this.promises.length > 0) {
-            return new Promise((resolve) => {
-                Promise
-                    .all(this.promises)
-                    .then(resolve(this.errors));
-            });
+            return Promise.all(this.promises).then(() => this.errors);
         }
         return this.errors;
     }

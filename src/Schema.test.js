@@ -669,13 +669,13 @@ describe('Schema', () => {
         });
 
 
-        it('async with promise (1 error)', (done) => {
+        it('async with promise (1 error)', () => {
             const asyncValidator = () => ({
                 validator(value) {
                     return new Promise((resolve) => {
                         setTimeout(() => {
                             resolve(value === 'test company');
-                        }, 100);
+                        }, 1000);
                     });
                 },
                 errorMessage: 'async validation failed',
@@ -695,21 +695,18 @@ describe('Schema', () => {
 
             const testObjectErrors = schema.validate(testObject);
             jest.runOnlyPendingTimers();
-            if (testObjectErrors instanceof Promise) {
-                testObjectErrors.then((results) => {
-                    expect(Object.keys(results).length).toBe(1);
-                    done();
-                });
-            }
+            return testObjectErrors.then((results) => {
+                expect(Object.keys(results).length).toBe(1);
+            });
         });
 
-        it('async with promise (0 error)', (done) => {
+        it('async with promise (0 error)', () => {
             const asyncValidator = () => ({
                 validator(value) {
                     return new Promise((resolve) => {
                         setTimeout(() => {
                             resolve(value === 'test company2');
-                        }, 100);
+                        }, 1000);
                     });
                 },
                 errorMessage: 'async validation failed',
@@ -729,12 +726,9 @@ describe('Schema', () => {
 
             const testObjectErrors = schema.validate(testObject);
             jest.runOnlyPendingTimers();
-            if (testObjectErrors instanceof Promise) {
-                testObjectErrors.then((results) => {
-                    expect(Object.keys(results).length).toBe(0);
-                    done();
-                });
-            }
+            return testObjectErrors.then((results) => {
+                expect(Object.keys(results).length).toBe(0);
+            });
         });
 
         it('should be able to return multiple errorMessages in an array from validator', () => {
