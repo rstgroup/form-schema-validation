@@ -1,7 +1,7 @@
 # SCHEMA
 
-[![Build Status](https://travis-ci.org/mprzodala/form-schema-validation.svg?branch=master)](https://travis-ci.org/mprzodala/form-schema-validation)
-[![Coverage Status](https://coveralls.io/repos/github/mprzodala/form-schema-validation/badge.svg?branch=master)](https://coveralls.io/github/mprzodala/form-schema-validation?branch=master)
+[![Build Status](https://travis-ci.org/rstgroup/form-schema-validation.svg?branch=master)](https://travis-ci.org/rstgroup/form-schema-validation)
+[![Coverage Status](https://coveralls.io/repos/github/rstgroup/form-schema-validation/badge.svg?branch=master)](https://coveralls.io/github/rstgroup/form-schema-validation?branch=master)
 [![npm](https://img.shields.io/npm/l/form-schema-validation.svg)](https://npmjs.org/package/form-schema-validation)
 [![npm](https://img.shields.io/npm/v/form-schema-validation.svg)](https://npmjs.org/package/form-schema-validation)
 
