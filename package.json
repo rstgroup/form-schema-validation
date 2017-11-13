@@ -4,8 +4,8 @@
   "description": "Schema for form validation",
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
-  "repository": "https://github.com/mprzodala/form-schema-validation",
-  "homepage": "https://github.com/mprzodala/form-schema-validation",
+  "repository": "https://github.com/rstgroup/form-schema-validation",
+  "homepage": "https://github.com/rstgroup/form-schema-validation",
   "license": "MIT",
   "scripts": {
     "test": "jest && npm run lint",
