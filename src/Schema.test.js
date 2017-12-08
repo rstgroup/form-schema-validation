@@ -219,6 +219,74 @@ describe('Schema', () => {
             expect(Object.keys(testObject2Errors).length).toBe(0);
             expect(Object.keys(testObject3Errors).length).toBe(1);
         });
+
+        it('should validate optionalType', () => {
+            const subSchema = new Schema({
+                name: {
+                    type: Schema.optionalType(String),
+                },
+            });
+            const schema = new Schema({
+                name: {
+                    type: Schema.optionalType(String),
+                },
+                age: {
+                    type: Schema.optionalType(Number),
+                },
+                date: {
+                    type: Schema.optionalType(Date),
+                },
+                object: {
+                    type: Schema.optionalType(Object),
+                },
+                isTrue: {
+                    type: Schema.optionalType(Boolean),
+                },
+                array: {
+                    type: Schema.optionalType(Array),
+                },
+                schemaObject: {
+                    type: Schema.optionalType(subSchema),
+                },
+            });
+            const modelWithEmptyCorrectTypes = {
+                name: '',
+                age: NaN,
+                date: new Date(),
+                object: {},
+                isTrue: false,
+                array: [],
+                schemaObject: {},
+            };
+            const modelWithNull = {
+                name: null,
+                age: null,
+                date: null,
+                object: null,
+                isTrue: null,
+                array: null,
+                schemaObject: null,
+            };
+            const modelWithUndefined = {};
+            const modelWithNumber = {
+                name: 0,
+                age: 'foo',
+                date: 'foo',
+                object: 'foo',
+                isTrue: 'foo',
+                array: 0,
+                schemaObject: 'foo',
+            };
+
+            const modelWithEmptyCorrectTypesErrors = schema.validate(modelWithEmptyCorrectTypes);
+            const modelWithNullErrors = schema.validate(modelWithNull);
+            const modelWithUndefinedErrors = schema.validate(modelWithUndefined);
+            const modelWithNumberErrors = schema.validate(modelWithNumber);
+            expect(Object.keys(modelWithEmptyCorrectTypesErrors).length).toBe(0);
+            expect(Object.keys(modelWithNullErrors).length).toBe(0);
+            expect(Object.keys(modelWithUndefinedErrors).length).toBe(0);
+            expect(Object.keys(modelWithNumberErrors).length).toBe(7);
+        });
     });
 
     describe('Validation array of types', () => {
@@ -496,6 +564,82 @@ describe('Schema', () => {
             expect(Object.keys(testObject3Errors).length).toBe(1);
             expect(testObject3Errors.owners[0].name.length).toBe(1);
         });
+
+        it('should validate array of optionalType', () => {
+            const subSchema = new Schema({
+                name: {
+                    type: Schema.optionalType(String),
+                },
+            });
+            const schema = new Schema({
+                name: {
+                    type: [Schema.optionalType(String)],
+                },
+                age: {
+                    type: [Schema.optionalType(Number)],
+                },
+                date: {
+                    type: [Schema.optionalType(Date)],
+                },
+                object: {
+                    type: [Schema.optionalType(Object)],
+                },
+                isTrue: {
+                    type: [Schema.optionalType(Boolean)],
+                },
+                array: {
+                    type: [Schema.optionalType(Array)],
+                },
+                schemaObject: {
+                    type: [Schema.optionalType(subSchema)],
+                },
+            });
+            const modelWithEmptyCorrectTypes = {
+                name: [''],
+                age: [NaN],
+                date: [new Date()],
+                object: [{}],
+                isTrue: [false],
+                array: [[]],
+                schemaObject: [{}],
+            };
+            const modelWithNull = {
+                name: [null],
+                age: [null],
+                date: [null],
+                object: [null],
+                isTrue: [null],
+                array: [null],
+                schemaObject: [null],
+            };
+            const modelWithUndefined = {
+                name: [],
+                age: [],
+                date: [],
+                object: [],
+                isTrue: [],
+                array: [],
+                schemaObject: [],
+            };
+            const modelWithNumber = {
+                name: [0],
+                age: ['foo'],
+                date: ['foo'],
+                object: ['foo'],
+                isTrue: ['foo'],
+                array: [0],
+                schemaObject: ['foo'],
+            };
+
+            const modelWithEmptyCorrectTypesErrors = schema.validate(modelWithEmptyCorrectTypes);
+            const modelWithNullErrors = schema.validate(modelWithNull);
+            const modelWithUndefinedErrors = schema.validate(modelWithUndefined);
+            const modelWithNumberErrors = schema.validate(modelWithNumber);
+            expect(Object.keys(modelWithEmptyCorrectTypesErrors).length).toBe(0);
+            expect(Object.keys(modelWithNullErrors).length).toBe(0);
+            expect(Object.keys(modelWithUndefinedErrors).length).toBe(0);
+            expect(Object.keys(modelWithNumberErrors).length).toBe(7);
+        });
     });
 
     describe('Validate required', () => {
@@ -627,6 +771,92 @@ describe('Schema', () => {
             const testObject2Errors = schema.validate(modelWithErrors);
             expect(Object.keys(testObjectErrors).length).toBe(0);
             expect(Object.keys(testObject2Errors).length).toBe(1);
+        });
+
+        it('should validate optionalType', () => {
+            const subSchema = new Schema({
+                name: {
+                    type: Schema.optionalType(String),
+                },
+            });
+            const schema = new Schema({
+                name: {
+                    type: Schema.optionalType(String),
+                    required: true,
+                },
+                age: {
+                    type: Schema.optionalType(Number),
+                    required: true,
+                },
+                date: {
+                    type: Schema.optionalType(Date),
+                    required: true,
+                },
+                object: {
+                    type: Schema.optionalType(Object),
+                    required: true,
+                },
+                isTrue: {
+                    type: Schema.optionalType(Boolean),
+                    required: true,
+                },
+                array: {
+                    type: Schema.optionalType(Array),
+                    required: true,
+                },
+                schemaObject: {
+                    type: Schema.optionalType(subSchema),
+                    required: true,
+                },
+            });
+            const modelWithFilledCorrectTypes = {
+                name: 'foo',
+                age: 123,
+                date: new Date(),
+                object: { foo: 'bar' },
+                isTrue: true,
+                array: ['foo'],
+                schemaObject: { name: '' },
+            };
+            const modelWithEmptyCorrectTypes = {
+                name: '',
+                age: NaN,
+                date: new Date(),
+                object: {},
+                isTrue: false,
+                array: [],
+                schemaObject: {},
+            };
+            const modelWithNull = {
+                name: null,
+                age: null,
+                date: null,
+                object: null,
+                isTrue: null,
+                array: null,
+                schemaObject: null,
+            };
+            const modelWithUndefined = {};
+            const modelWithNumber = {
+                name: 0,
+                age: 'foo',
+                date: 'foo',
+                object: 'foo',
+                isTrue: 'foo',
+                array: 0,
+                schemaObject: 'foo',
+            };
+
+            const modelWithFilledCorrectTypesErrors = schema.validate(modelWithFilledCorrectTypes);
+            const modelWithEmptyCorrectTypesErrors = schema.validate(modelWithEmptyCorrectTypes);
+            const modelWithNullErrors = schema.validate(modelWithNull);
+            const modelWithUndefinedErrors = schema.validate(modelWithUndefined);
+            const modelWithNumberErrors = schema.validate(modelWithNumber);
+            expect(Object.keys(modelWithFilledCorrectTypesErrors).length).toBe(0);
+            expect(Object.keys(modelWithEmptyCorrectTypesErrors).length).toBe(6);
+            expect(Object.keys(modelWithNullErrors).length).toBe(7);
+            expect(Object.keys(modelWithUndefinedErrors).length).toBe(7);
+            expect(Object.keys(modelWithNumberErrors).length).toBe(7);
         });
     });
     describe('Should validate using custom validators', () => {
@@ -857,6 +1087,20 @@ describe('Schema', () => {
                     bar: 'foo',
                 },
             });
+        });
+
+        it('should get default value for optionalType', () => {
+            const schema = new Schema({
+                foo: {
+                    type: Schema.optionalType(String),
+                },
+                bar: {
+                    type: Schema.optionalType(String),
+                    defaultValue: 'foo',
+                },
+            });
+            const defaultModel = schema.getDefaultValues();
+            expect(defaultModel).toEqual({ bar: 'foo' });
         });
 
         it('should not return default value if field has flag disableDefaultValue', () => {

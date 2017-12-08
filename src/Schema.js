@@ -25,6 +25,25 @@ class Schema {
     static oneOfTypes(types) {
         return new OneOfTypes(types);
     }
+    static optionalType(type, uniqueTypeName = '') {
+        const fieldType = getFieldType({ type });
+        const { name = 'Type' } = fieldType;
+        return new SchemaType(`Optional${name}${uniqueTypeName}`, {
+            getDefaultValue() {
+                return undefined;
+            },
+            validator(value, key, index) {
+                if (value === null || value === undefined) {
+                    return true;
+                }
+                return this.validateType(type, value, key, index);
+            },
+            requiredValidator(value, key) {
+                this.validateRequired({ type, required: true }, value, key);
+                return true;
+            },
+        });
+    }
 
     constructor(schema, messages, validateKeys = true) {
         this.schema = schema;
@@ -214,6 +233,10 @@ class Schema {
                 this.typesRequiredValidators[name](value, key);
                 return;
             }
+            if (fieldSchema.type instanceof Schema) {
+                this.validateRequiredTypeSchema(fieldSchema.type.schema, value, key);
+                return;
+            }
             this.validateRequiredType(value, key);
         }
     }
@@ -226,7 +249,7 @@ class Schema {
     }
 
     validateRequiredTypeObject(value, key) {
-        if (typeof value === 'object' && Object.keys(value).length > 0) {
+        if (typeof value === 'object' && value !== null && Object.keys(value).length > 0) {
             return;
         }
         const { label } = this.getField(key);
@@ -242,7 +265,7 @@ class Schema {
     }
 
     validateRequiredTypeNumber(value, key) {
-        if (isNaN(value)) {
+        if (typeof value !== 'number' || isNaN(value)) {
             const { label } = this.getField(key);
             this.setError(key, this.messages.validateRequired(label || key));
         }
@@ -251,6 +274,23 @@ class Schema {
     validateRequiredTypeDate(value, key) {
         if (value instanceof Date) {
             return;
+        }
+        const { label } = this.getField(key);
+        this.setError(key, this.messages.validateRequired(label || key));
+    }
+
+    validateRequiredTypeSchema(schema, value, key) {
+        if (typeof value === 'object' && value !== null) {
+            let hasRequiredKeys = true;
+            const valueKeys = Object.keys(value);
+            Object.keys(schema).forEach((requiredKey) => {
+                if (valueKeys.indexOf(requiredKey) < 0) {
+                    hasRequiredKeys = false;
+                }
+            });
+            if (hasRequiredKeys) {
+                return;
+            }
         }
         const { label } = this.getField(key);
         this.setError(key, this.messages.validateRequired(label || key));
