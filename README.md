@@ -59,7 +59,7 @@ const customValidator = {
             }, 1000);
         });
     },
-    errorMessage: 'async test error';
+    errorMessage: 'async test error',
 }
 
 const schema = new Schema({
@@ -113,6 +113,7 @@ results.then((errors) => {
 | Date | This type check value is instance of Date |
 | new Schema | This type check value is instance of Schema and validate value by this schema |
 | Schema.oneOfType([type1, type2, ...]) | This type give you posibility check one of types it will return error if value don't match all types |
+| Schema.optionalType(type) | This type will pass validation if value is null or undefined when field is not required |
 | SchemaType | You can register new schema type that has name, validator, validator when field is required (requiredValidator) and getDefaultValue |
 
 #### Example of custom validator
@@ -163,7 +164,7 @@ const schema = new Schema({
     companyName: {
         type: String,
         required: true,
-        label: 'Company name'
+        label: 'Company name',
         validators: [min(2, 'Company name should be longer then 2 chars')]
     },
     createdAt: {
@@ -172,7 +173,7 @@ const schema = new Schema({
         label: 'When start'
     },
     workers: {
-        type: Number
+        type: Number,
         label: 'How many workers we have'
     }
 });
@@ -204,12 +205,12 @@ const groupSchema = new Schema({
         label: 'Group name'
     },
     createdAt: {
-        type: Date
+        type: Date,
         defaultValue: new Date(),
         label: 'Created at'
     },
     members: {
-        type: [userSchema]
+        type: [userSchema],
         label: 'Members'
     }
 });
@@ -302,12 +303,12 @@ const groupSchema = new Schema({
         label: 'Group name'
     },
     createdAt: {
-        type: Date
+        type: Date,
         defaultValue: new Date(),
         label: 'Created at'
     },
     members: {
-        type: [userSchema]
+        type: [userSchema],
         label: 'Members'
     }
 }, ErrorMessages);
