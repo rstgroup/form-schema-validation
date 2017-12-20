@@ -388,6 +388,7 @@ class Schema {
             }
             fields[fieldName] = this.schema[fieldName];
         });
+        this.schema = fields;
         return fields;
     }
 
