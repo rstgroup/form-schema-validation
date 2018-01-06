@@ -44,13 +44,13 @@ describe('helpers', () => {
         const date = Date;
         const custom = { getDefaultValue: () => 'bar' };
 
-        expect(isNaN(getDefaultValueForType(number))).toEqual(true);
+        expect(Number.isNaN(getDefaultValueForType(number))).toEqual(true);
         expect(getDefaultValueForType(string)).toEqual('');
         expect(getDefaultValueForType(boolean)).toEqual(false);
         expect(getDefaultValueForType(custom)).toEqual('bar');
         expect(getDefaultValueForType(date) instanceof Date).toEqual(true);
 
-        expect(isNaN(getDefaultValueForType(number, true)[0])).toEqual(true);
+        expect(Number.isNaN(getDefaultValueForType(number, true)[0])).toEqual(true);
         expect(getDefaultValueForType(string, true)).toEqual(['']);
         expect(getDefaultValueForType(boolean, true)).toEqual([false]);
         expect(getDefaultValueForType(custom, true)).toEqual(['bar']);

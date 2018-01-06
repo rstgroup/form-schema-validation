@@ -265,7 +265,7 @@ class Schema {
     }
 
     validateRequiredTypeNumber(value, key) {
-        if (typeof value !== 'number' || isNaN(value)) {
+        if (typeof value !== 'number' || Number.isNaN(value)) {
             const { label } = this.getField(key);
             this.setError(key, this.messages.validateRequired(label || key));
         }
@@ -298,9 +298,8 @@ class Schema {
 
     validateType(type, value, key, index) {
         const { name: typeName } = type;
-        if (type instanceof SchemaType && typeof this.typesValidators[typeName] !== 'function') {
-            this.registerType(type);
-        }
+        this.registerTypeIfNotExists(type, typeName);
+
         if (typeof this.typesValidators[typeName] === 'function') {
             return this.typesValidators[typeName](value, key, type, index);
         }
@@ -395,6 +394,12 @@ class Schema {
         Object.keys(fieldsToExtend).forEach((fieldName) => {
             this.schema[fieldName] = fieldsToExtend[fieldName];
         });
+    }
+
+    registerTypeIfNotExists(type, typeName) {
+        if (type instanceof SchemaType && typeof this.typesValidators[typeName] !== 'function') {
+            this.registerType(type);
+        }
     }
 
     registerType(type) {
