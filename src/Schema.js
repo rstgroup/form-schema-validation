@@ -5,6 +5,7 @@ import {
     getDefaultValueForType,
     getDefaultValueFromOptions,
     wrapToArray,
+    getFunctionName,
 } from './helpers';
 import OneOfTypes from './OneOfTypes';
 import SchemaType from './SchemaType';
@@ -297,7 +298,7 @@ class Schema {
     }
 
     validateType(type, value, key, index) {
-        const { name: typeName } = type;
+        const typeName = getFunctionName(type);
         this.registerTypeIfNotExists(type, typeName);
 
         if (typeof this.typesValidators[typeName] === 'function') {

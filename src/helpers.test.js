@@ -5,6 +5,7 @@ import {
     getFieldType,
     getDefaultValueForType,
     getDefaultValueFromOptions,
+    getFunctionName,
 } from './helpers';
 
 describe('helpers', () => {
@@ -81,5 +82,19 @@ describe('helpers', () => {
         };
         expect(getFieldType(fooField)).toBe(String);
         expect(getFieldType(barField)).toBe(String);
+    });
+
+    it('should return function name', () => {
+        const barFunction = function bar() {};
+        const fooFunction = function foo() {};
+        Object.defineProperty(fooFunction, 'name', { value: undefined });
+        expect(getFunctionName(barFunction)).toBe('bar');
+        expect(getFunctionName(String)).toBe('String');
+        expect(getFunctionName(Number)).toBe('Number');
+        expect(getFunctionName(Object)).toBe('Object');
+        expect(getFunctionName(Array)).toBe('Array');
+        expect(getFunctionName(Boolean)).toBe('Boolean');
+        expect(getFunctionName(Date)).toBe('Date');
+        expect(getFunctionName(fooFunction)).toBe('foo');
     });
 });

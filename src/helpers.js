@@ -46,3 +46,15 @@ export const getDefaultValueFromOptions = (options) => {
     }
     return firstOption;
 };
+
+export const getFunctionName = (type) => {
+    const { name: typeName } = type;
+    if (typeof type === 'function' && !typeName) {
+        const functionString = type.toString();
+        return functionString
+            .substr(0, functionString.indexOf('('))
+            .replace('function ', '')
+            .trim();
+    }
+    return typeName;
+};
