@@ -1116,6 +1116,25 @@ describe('Schema', () => {
         });
     });
 
+    it('should overwrite validation messages', () => {
+        const errorMessage = 'foo error';
+        const schema = new Schema({
+            companyName: {
+                type: String,
+                required: true,
+            },
+        }, {
+            validateRequired: () => errorMessage,
+        });
+
+        const testObjectErrors = schema.validate({
+            companyName: '',
+        });
+
+        expect(testObjectErrors).toEqual({ companyName: [errorMessage] });
+        expect(Object.keys(schema.messages).length > 1).toEqual(true);
+    });
+
     it('should return model error if model is undefined', () => {
         const schema = new Schema({
             companyName: {
