@@ -6,95 +6,172 @@ import {
     getDefaultValueForType,
     getDefaultValueFromOptions,
     getFunctionName,
+    removeFirstKeyIfNumber,
+    getErrorIndexFromKeys,
 } from './helpers';
 
 describe('helpers', () => {
-    it('should create object from another object with specific keys', () => {
-        const bar = {
-            foo: 'bar',
-            foo2: 'bar2',
-            foo3: 'bar3',
-            foo4: 'bar4',
-        };
-        const foo = pick(bar, ['foo', 'foo2']);
+    describe('pick', () => {
+        it('should create object from another object with specific keys', () => {
+            const bar = {
+                foo: 'bar',
+                foo2: 'bar2',
+                foo3: 'bar3',
+                foo4: 'bar4',
+            };
+            const foo = pick(bar, ['foo', 'foo2']);
 
-        expect(foo).toEqual({
-            foo: 'bar',
-            foo2: 'bar2',
+            expect(foo).toEqual({
+                foo: 'bar',
+                foo2: 'bar2',
+            });
         });
     });
+    describe('difference', () => {
+        it('should compere two array and return difference', () => {
+            const foo = ['foo', 'foo2', 'foo3', 'foo4'];
+            const bar = ['foo', 'foo2'];
 
-    it('should compere two array and return difference', () => {
-        const foo = ['foo', 'foo2', 'foo3', 'foo4'];
-        const bar = ['foo', 'foo2'];
-
-        expect(difference(foo, bar)).toEqual(['foo3', 'foo4']);
+            expect(difference(foo, bar)).toEqual(['foo3', 'foo4']);
+        });
     });
-
-    it('should wrap value to array', () => {
-        const foo = 'test';
-
-        expect(wrapToArray(foo, true)).toEqual(['test']);
-        expect(wrapToArray(foo)).toEqual('test');
+    describe('wrapToArray', () => {
+        it('should wrap value to array', () => {
+            const foo = 'test';
+            expect(wrapToArray(foo, true)).toEqual(['test']);
+        });
+        it('should not wrap value to array', () => {
+            const foo = 'test';
+            expect(wrapToArray(foo)).toEqual('test');
+        });
     });
+    describe('getDefaultValueForType', () => {
+        it('should get default value for type Number', () => {
+            const type = Number;
+            expect(Number.isNaN(getDefaultValueForType(type))).toEqual(true);
+        });
+        it('should get default value for type array of Numbers', () => {
+            const type = Number;
+            expect(Number.isNaN(getDefaultValueForType(type, true)[0])).toEqual(true);
+        });
 
-    it('should get default value for type', () => {
-        const number = Number;
-        const string = String;
-        const boolean = Boolean;
-        const date = Date;
-        const custom = { getDefaultValue: () => 'bar' };
+        it('should get default value for type String', () => {
+            const type = String;
+            expect(getDefaultValueForType(type)).toEqual('');
+        });
+        it('should get default value for type array of Strings', () => {
+            const type = String;
+            expect(getDefaultValueForType(type, true)).toEqual(['']);
+        });
 
-        expect(Number.isNaN(getDefaultValueForType(number))).toEqual(true);
-        expect(getDefaultValueForType(string)).toEqual('');
-        expect(getDefaultValueForType(boolean)).toEqual(false);
-        expect(getDefaultValueForType(custom)).toEqual('bar');
-        expect(getDefaultValueForType(date) instanceof Date).toEqual(true);
+        it('should get default value for type Boolean', () => {
+            const type = Boolean;
+            expect(getDefaultValueForType(type)).toEqual(false);
+        });
+        it('should get default value for type array of Strings', () => {
+            const type = Boolean;
+            expect(getDefaultValueForType(type, true)).toEqual([false]);
+        });
 
-        expect(Number.isNaN(getDefaultValueForType(number, true)[0])).toEqual(true);
-        expect(getDefaultValueForType(string, true)).toEqual(['']);
-        expect(getDefaultValueForType(boolean, true)).toEqual([false]);
-        expect(getDefaultValueForType(custom, true)).toEqual(['bar']);
-        expect(getDefaultValueForType(date, true)[0] instanceof Date).toEqual(true);
+        it('should get default value for type Custom', () => {
+            const type = { getDefaultValue: () => 'bar' };
+            expect(getDefaultValueForType(type)).toEqual('bar');
+        });
+        it('should get default value for type array of Custom', () => {
+            const type = { getDefaultValue: () => 'bar' };
+            expect(getDefaultValueForType(type, true)).toEqual(['bar']);
+        });
+
+        it('should get default value for type Date', () => {
+            const type = Date;
+            expect(getDefaultValueForType(type) instanceof Date).toEqual(true);
+        });
+        it('should get default value for type array of Date', () => {
+            const type = Date;
+            expect(getDefaultValueForType(type, true)[0] instanceof Date).toEqual(true);
+        });
     });
+    describe('getDefaultValueFromOptions', () => {
+        it('should get default value from options array of strings', () => {
+            const options = [
+                'test1',
+                'test2',
+            ];
 
-    it('should get default value from options', () => {
-        const options = [
-            'test1',
-            'test2',
-        ];
+            expect(getDefaultValueFromOptions(options)).toEqual('test1');
+        });
+        it('should get default value from options array of objects', () => {
+            const options2 = [
+                { label: 'test1', value: '1' },
+                { label: 'test2', value: '2' },
+            ];
 
-        const options2 = [
-            { label: 'test1', value: '1' },
-            { label: 'test2', value: '2' },
-        ];
-
-        expect(getDefaultValueFromOptions(options)).toEqual('test1');
-        expect(getDefaultValueFromOptions(options2)).toEqual('1');
+            expect(getDefaultValueFromOptions(options2)).toEqual('1');
+        });
     });
+    describe('getFieldType', () => {
+        it('should get field type from field', () => {
+            const fooField = {
+                type: String,
+            };
 
-    it('should get field type from field', () => {
-        const fooField = {
-            type: String,
-        };
-        const barField = {
-            type: [String],
-        };
-        expect(getFieldType(fooField)).toBe(String);
-        expect(getFieldType(barField)).toBe(String);
+            expect(getFieldType(fooField)).toBe(String);
+        });
+        it('should get field type from field when type is array of type', () => {
+            const fooField = {
+                type: [String],
+            };
+
+            expect(getFieldType(fooField)).toBe(String);
+        });
     });
-
-    it('should return function name', () => {
-        const barFunction = function bar() {};
-        const fooFunction = function foo() {};
-        Object.defineProperty(fooFunction, 'name', { value: undefined });
-        expect(getFunctionName(barFunction)).toBe('bar');
-        expect(getFunctionName(String)).toBe('String');
-        expect(getFunctionName(Number)).toBe('Number');
-        expect(getFunctionName(Object)).toBe('Object');
-        expect(getFunctionName(Array)).toBe('Array');
-        expect(getFunctionName(Boolean)).toBe('Boolean');
-        expect(getFunctionName(Date)).toBe('Date');
-        expect(getFunctionName(fooFunction)).toBe('foo');
+    describe('getFunctionName', () => {
+        it('should return function name of String', () => {
+            expect(getFunctionName(String)).toBe('String');
+        });
+        it('should return function name of Number', () => {
+            expect(getFunctionName(Number)).toBe('Number');
+        });
+        it('should return function name of Object', () => {
+            expect(getFunctionName(Object)).toBe('Object');
+        });
+        it('should return function name of Array', () => {
+            expect(getFunctionName(Array)).toBe('Array');
+        });
+        it('should return function name of Boolean', () => {
+            expect(getFunctionName(Boolean)).toBe('Boolean');
+        });
+        it('should return function name of Date', () => {
+            expect(getFunctionName(Date)).toBe('Date');
+        });
+        it('should return function name of fooFunction', () => {
+            const fooFunction = function foo() {};
+            Object.defineProperty(fooFunction, 'name', { value: undefined });
+            expect(getFunctionName(fooFunction)).toBe('foo');
+        });
+        it('should return function name of barFunction', () => {
+            const barFunction = function bar() {};
+            expect(getFunctionName(barFunction)).toBe('bar');
+        });
+    });
+    describe('removeFirstKeyIfNumber', () => {
+        it('should remove first key if is number', () => {
+            const keys = ['0', 'foo', 'bar'];
+            expect(removeFirstKeyIfNumber(keys)).toEqual(['foo', 'bar']);
+        });
+        it('should not remove first key if is string', () => {
+            const keys = ['first', 'foo', 'bar'];
+            expect(removeFirstKeyIfNumber(keys)).toEqual(['first', 'foo', 'bar']);
+        });
+    });
+    describe('getErrorIndexFromKeys', () => {
+        it('should return first key as number if is number', () => {
+            const keys = ['1', 'foo', 'bar'];
+            expect(getErrorIndexFromKeys(keys)).toEqual(1);
+        });
+        it('should return -1 if first key is string', () => {
+            const keys = ['first', 'foo', 'bar'];
+            expect(getErrorIndexFromKeys(keys)).toEqual(-1);
+        });
     });
 });

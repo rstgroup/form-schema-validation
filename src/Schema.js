@@ -6,6 +6,8 @@ import {
     getDefaultValueFromOptions,
     wrapToArray,
     getFunctionName,
+    removeFirstKeyIfNumber,
+    getErrorIndexFromKeys,
 } from './helpers';
 import OneOfTypes from './OneOfTypes';
 import SchemaType from './SchemaType';
@@ -83,6 +85,8 @@ class Schema {
             Boolean: this.validateRequiredType,
             Date: this.validateRequiredTypeDate,
         };
+
+        this.additionalValidators = [];
     }
 
     getDefaultValues() {
@@ -148,6 +152,21 @@ class Schema {
         this.errors[key].push(message);
     }
 
+    setModelError(path, message) {
+        let error = message;
+        const pathKeys = path.split('.');
+        const [firstKey, ...keys] = pathKeys;
+        const errorIndex = getErrorIndexFromKeys(keys);
+        const field = this.getField(firstKey);
+        const fieldType = getFieldType(field);
+        if (fieldType instanceof Schema) {
+            const childPath = removeFirstKeyIfNumber(keys).join('.');
+            fieldType.setModelError(childPath, message);
+            error = fieldType.errors;
+        }
+        this.setError(firstKey, error, errorIndex);
+    }
+
     checkModel(model) {
         if (!model) {
             this.setError('model', this.messages.modelIsUndefined());
@@ -192,6 +211,7 @@ class Schema {
                 key,
             });
         });
+        this.validateAdditionalValidators(model);
     }
 
     resolveValidatorErrorsForKey(key, errorMessage, results) {
@@ -225,6 +245,10 @@ class Schema {
             }
             this.resolveValidatorErrorsForKey(key, errorMessage, results);
         });
+    }
+
+    validateAdditionalValidators(model) {
+        this.additionalValidators.forEach(({ validator }) => validator(model, this));
     }
 
     validateRequired(fieldSchema, value, key) {
@@ -408,6 +432,23 @@ class Schema {
         this.typesValidators[name] = validator.bind(this);
         if (requiredValidator) {
             this.typesRequiredValidators[name] = requiredValidator.bind(this);
+        }
+    }
+
+    checkValidatorIsRegistered(validatorName) {
+        return this.additionalValidators.findIndex(({ name }) => name === validatorName) > -1;
+    }
+
+    addValidator(validatorName, validator) {
+        if (typeof validator === 'function' && !this.checkValidatorIsRegistered(validatorName)) {
+            this.additionalValidators.push({ name: validatorName, validator });
+        }
+    }
+
+    removeValidator(validatorName) {
+        const index = this.additionalValidators.findIndex(({ name }) => name === validatorName);
+        if (index > -1) {
+            this.additionalValidators.splice(index, 1);
         }
     }
 }

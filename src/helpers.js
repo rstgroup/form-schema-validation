@@ -58,3 +58,19 @@ export const getFunctionName = (type) => {
     }
     return typeName;
 };
+
+export const removeFirstKeyIfNumber = (keys) => {
+    const firstKey = parseInt(keys[0], 10);
+    if (Number.isInteger(firstKey)) {
+        keys.splice(0, 1);
+    }
+    return keys;
+};
+
+export const getErrorIndexFromKeys = (keys) => {
+    const firstKey = parseInt(keys[0], 10);
+    if (Number.isInteger(firstKey)) {
+        return firstKey;
+    }
+    return -1;
+};

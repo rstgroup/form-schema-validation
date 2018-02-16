@@ -1503,4 +1503,253 @@ describe('Schema', () => {
             expect(schema.getDefaultValues()).toEqual({ foo: 'foo', bar: '' });
         });
     });
+    describe('additionalValidators', () => {
+        it('should add additional validator', () => {
+            const validatorName = 'fooValidator';
+            const fooValidator = jest.fn();
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            schema.addValidator(validatorName, fooValidator);
+            expect(schema.additionalValidators).toEqual([
+                {
+                    name: validatorName,
+                    validator: fooValidator,
+                },
+            ]);
+        });
+        it('should not add the same additional validator', () => {
+            const validatorName = 'fooValidator';
+            const fooValidator = jest.fn();
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            schema.addValidator(validatorName, fooValidator);
+            schema.addValidator(validatorName, fooValidator);
+            expect(schema.additionalValidators).toEqual([
+                {
+                    name: validatorName,
+                    validator: fooValidator,
+                },
+            ]);
+        });
+        it('should remove additional validator', () => {
+            const validatorName = 'fooValidator';
+            const fooValidator = jest.fn();
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            schema.addValidator(validatorName, fooValidator);
+            schema.removeValidator(validatorName);
+            expect(schema.additionalValidators).toEqual([]);
+        });
+        it('should not remove additional validator if not exists', () => {
+            const validatorName = 'fooValidator';
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            schema.removeValidator(validatorName);
+            expect(schema.additionalValidators).toEqual([]);
+        });
+        it('should return true if validator is registred', () => {
+            const validatorName = 'fooValidator';
+            const fooValidator = jest.fn();
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            schema.addValidator(validatorName, fooValidator);
+            expect(schema.checkValidatorIsRegistered(validatorName)).toEqual(true);
+        });
+        it('should return false if validator is not registred', () => {
+            const validatorName = 'fooValidator';
+            const schema = new Schema({
+                foo: {
+                    type: String,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+
+            expect(schema.checkValidatorIsRegistered(validatorName)).toEqual(false);
+        });
+        it('should set error on field in first layer of model', () => {
+            const modelSchema = new Schema({
+                foo: {
+                    type: String,
+                    required: true,
+                },
+                bar: {
+                    type: String,
+                },
+            });
+            const data = {
+                foo: 'foo',
+                bar: 'bar',
+            };
+
+            modelSchema.addValidator('fooValidator', (model, schema) => {
+                schema.setModelError('foo', 'errorMessage');
+            });
+
+            expect(modelSchema.validate(data)).toEqual({ foo: ['errorMessage'] });
+        });
+        it('should set error on field in second layer of model', () => {
+            const fooSchema = new Schema({
+                fooStart: {
+                    type: String,
+                },
+                fooEnd: {
+                    type: String,
+                },
+            });
+            const modelSchema = new Schema({
+                foo: {
+                    type: fooSchema,
+                    required: true,
+                },
+            });
+            const data = {
+                foo: {
+                    fooStart: 'start',
+                    fooEnd: 'end',
+                },
+            };
+
+            modelSchema.addValidator('fooValidator', (model, schema) => {
+                schema.setModelError('foo.fooStart', 'errorMessage');
+            });
+
+            expect(modelSchema.validate(data)).toEqual({
+                foo: [
+                    {
+                        fooStart: ['errorMessage'],
+                    },
+                ],
+            });
+        });
+        it('should set error on field in third layer of model', () => {
+            const fooBarSchema = new Schema({
+                bar1: {
+                    type: String,
+                },
+                bar2: {
+                    type: String,
+                },
+            });
+            const fooSchema = new Schema({
+                bar: {
+                    type: fooBarSchema,
+                },
+            });
+            const modelSchema = new Schema({
+                foo: {
+                    type: fooSchema,
+                    required: true,
+                },
+            });
+            const data = {
+                foo: {
+                    bar: {
+                        bar1: 'fooBarBar1',
+                        bar2: 'fooBarBar1',
+                    },
+                },
+            };
+
+            modelSchema.addValidator('fooValidator', (model, schema) => {
+                schema.setModelError('foo.bar.bar1', 'errorMessage');
+            });
+
+            expect(modelSchema.validate(data)).toEqual({
+                foo: [
+                    {
+                        bar: [
+                            { bar1: ['errorMessage'] },
+                        ],
+                    },
+                ],
+            });
+        });
+        it('should set error on field in third layer of model in specific element in array', () => {
+            const fooBarSchema = new Schema({
+                bar1: {
+                    type: String,
+                },
+                bar2: {
+                    type: String,
+                },
+            });
+            const fooSchema = new Schema({
+                bars: {
+                    type: [fooBarSchema],
+                },
+            });
+            const modelSchema = new Schema({
+                foo: {
+                    type: fooSchema,
+                    required: true,
+                },
+            });
+            const data = {
+                foo: {
+                    bars: [
+                        {
+                            bar1: 'fooBarBar1',
+                            bar2: 'fooBarBar1',
+                        },
+                        {
+                            bar1: 'fooBarBar1',
+                            bar2: '',
+                        },
+                    ],
+                },
+            };
+
+            modelSchema.addValidator('fooValidator', (model, schema) => {
+                schema.setModelError('foo.bars.1.bar1', 'errorMessage');
+            });
+
+            expect(modelSchema.validate(data)).toEqual({
+                foo: [
+                    {
+                        bars: [
+                            undefined,
+                            { bar1: ['errorMessage'] },
+                        ],
+                    },
+                ],
+            });
+        });
+    });
 });
