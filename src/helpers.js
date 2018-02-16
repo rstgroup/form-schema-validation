@@ -6,7 +6,7 @@ export const pick = (object, keys) => {
     return pickedObject;
 };
 
-export const difference = (keys, compareKeys) => {
+export const arraysDifference = (keys, compareKeys) => {
     const differenceBetweanObjects = [];
     keys.forEach((key) => {
         if (compareKeys.indexOf(key) < 0) differenceBetweanObjects.push(key);

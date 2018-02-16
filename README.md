@@ -5,28 +5,28 @@
 [![npm](https://img.shields.io/npm/l/form-schema-validation.svg)](https://npmjs.org/package/form-schema-validation)
 [![npm](https://img.shields.io/npm/v/form-schema-validation.svg)](https://npmjs.org/package/form-schema-validation)
 
-[1. Features](#features-of-form-schema-validation)<br />
-[2. Installation](#installation)<br />
-[3. How to use](#how-to-use)<br />
-[4. Constructor](#constructor)<br />
-[5. Methods](#methods)<br />
-[6. Types](#types)<br />
-[7. Example of custom validator](#example-of-custom-validator)<br />
-[8. Example of additional validator](#example-of-additional-validator)<br />
-[9. Schema definition Example](#schema-definition-example)<br />
-[10. Example of schema in schema](#example-of-schema-in-schema)<br />
-[11. Schema keys description](#schema-keys-description)<br />
-[12. Custom validation messages](#custom-validation-messages)<br />
-[13. Switch of keys validation](#switch-of-keys-validation)<br />
+1. [Features](#features)
+1. [Installation](#installation)
+1. [How to use](#how-to-use)
+1. [Constructor](#constructor)
+1. [Methods](#methods)
+1. [Types](#types)
+1. [Example of custom validator](#example-of-custom-validator)
+1. [Example of additional validator](#example-of-additional-validator)
+1. [Schema definition Example](#schema-definition-example)
+1. [Example of schema in schema](#example-of-schema-in-schema)
+1. [Schema keys description](#schema-keys-description)
+1. [Custom validation messages](#custom-validation-messages)
+1. [Switch of keys validation](#switch-of-keys-validation)
 
-### Features of form-schema-validation
+### Features
 
 - sync validation
 - async validation (Promise)
 - validate object structure
 - validate object keys
 - validate required fields
-- validate as optional
+- validate optional fields
 - validate by type
 - validate by custom type
 - validate by one of type
@@ -100,9 +100,9 @@ results.then((errors) => {
 
 | Name | Type | Description |
 |---|---|---|
-| schema | Object | schema will be used when you validate object |
-| errorMessages | Object | errors messages that will be displayed on error |
-| validateKeys | Boolean | this flag give you posibility to don't validate object keys not defined in schema |
+| schema | Object | Schema will be used when you validate object |
+| errorMessages | Object | Errors messages that will be displayed on error |
+| validateKeys | Boolean | This flag give you posibility to don't validate object keys not defined in schema |
 
 ### Methods
 
@@ -110,18 +110,18 @@ results.then((errors) => {
 |---|---|---|
 | validate | model: Object | Validate Object using defined schema |
 | setError | key: String, message: String, index: Number | Set error on field |
-| setModelError | path: String, message: String | Set error on model tree |
+| setModelError | path: String, message: String | Set error on model tree node |
 | getDefaultValues |  | Get default values for model using defined schema |
 | getField | name: String | Get field schema |
 | getField |  | Get all fields schemas |
 | oneOfTypes | types: Array of types | Give posibility to validate one of type (Static method) |
-| pick | fieldsToPick: [String] | get fields from schema by keys |
-| omit | fieldsToOmit: [String] | get fields from schema and omit fieldsToOmit |
-| extend | fieldsToExtend: [String] | extend schema by new fields or overwrite them |
-| registerType | type: SchemaType | register new schema type |
-| isValidatorRegistred | validatorName: String | check model validator exists in schema |
-| addValidator | validatorName: String, validator: Function(model: Object, schema: instance of Schema) | add model validator |
-| removeValidator | validatorName: String | remove model validator |
+| pick | fieldsToPick: [String] | Get fields from schema by keys |
+| omit | fieldsToOmit: [String] | Get fields from schema and omit fieldsToOmit |
+| extend | fieldsToExtend: [String] | Extend schema by new fields or overwrite them |
+| registerType | type: SchemaType | Register new schema type |
+| isValidatorRegistred | validatorName: String | Check model validator exists in schema |
+| addValidator | validatorName: String, validator: Function(model: Object, schema: instance of Schema) | Add model validator |
+| removeValidator | validatorName: String | Remove model validator |
 
 ### Types
 
@@ -179,7 +179,7 @@ const dataModel = {
 
 modelSchema.addValidator('fooValidator', (model, schema) => {
     if(model.foo.fooStart === 'start') {
-        schema.setModelError('foo.fooStart', 'errorMessage');
+        schema.setModelError('foo.fooStart', 'my foo error message');
     }
 });
 

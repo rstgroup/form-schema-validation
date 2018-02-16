@@ -1,6 +1,6 @@
 import {
     pick,
-    difference,
+    arraysDifference,
     getFieldType,
     getDefaultValueForType,
     getDefaultValueFromOptions,
@@ -52,6 +52,7 @@ class Schema {
         this.schema = schema;
         this.errors = {};
         this.promises = [];
+        this.additionalValidators = new Set();
         this.messages = messages || defaultMessages;
         this.validateKeys = validateKeys;
 
@@ -85,8 +86,6 @@ class Schema {
             Boolean: this.validateRequiredType,
             Date: this.validateRequiredTypeDate,
         };
-
-        this.additionalValidators = [];
     }
 
     getDefaultValues() {
@@ -179,7 +178,7 @@ class Schema {
         if (!this.validateKeys) return;
         const modelKeys = Object.keys(model);
         const schemaKeys = Object.keys(this.schema);
-        const keysDiff = difference(modelKeys, schemaKeys);
+        const keysDiff = arraysDifference(modelKeys, schemaKeys);
         if (keysDiff.length > 0) {
             keysDiff.forEach((key) => {
                 this.setError(key, this.messages.notDefinedKey(key));
@@ -248,7 +247,7 @@ class Schema {
     }
 
     validateAdditionalValidators(model) {
-        this.additionalValidators.forEach(({ validator }) => validator(model, this));
+        this.additionalValidators.forEach(validator => validator(model, this));
     }
 
     validateRequired(fieldSchema, value, key) {
@@ -435,21 +434,14 @@ class Schema {
         }
     }
 
-    isValidatorRegistered(validatorName) {
-        return this.additionalValidators.findIndex(({ name }) => name === validatorName) > -1;
-    }
-
-    addValidator(validatorName, validator) {
-        if (typeof validator === 'function' && !this.isValidatorRegistered(validatorName)) {
-            this.additionalValidators.push({ name: validatorName, validator });
+    addValidator(validator) {
+        if (typeof validator === 'function') {
+            this.additionalValidators.add(validator);
         }
     }
 
-    removeValidator(validatorName) {
-        const index = this.additionalValidators.findIndex(({ name }) => name === validatorName);
-        if (index > -1) {
-            this.additionalValidators.splice(index, 1);
-        }
+    removeValidator(validator) {
+        this.additionalValidators.delete(validator);
     }
 }
 
