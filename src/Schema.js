@@ -52,7 +52,7 @@ class Schema {
         this.schema = schema;
         this.errors = {};
         this.promises = [];
-        this.messages = messages || defaultMessages;
+        this.messages = { ...defaultMessages, ...messages };
         this.validateKeys = validateKeys;
 
         this.validateTypeString = this.validateTypeString.bind(this);
