@@ -435,12 +435,12 @@ class Schema {
         }
     }
 
-    checkValidatorIsRegistered(validatorName) {
+    isValidatorRegistered(validatorName) {
         return this.additionalValidators.findIndex(({ name }) => name === validatorName) > -1;
     }
 
     addValidator(validatorName, validator) {
-        if (typeof validator === 'function' && !this.checkValidatorIsRegistered(validatorName)) {
+        if (typeof validator === 'function' && !this.isValidatorRegistered(validatorName)) {
             this.additionalValidators.push({ name: validatorName, validator });
         }
     }

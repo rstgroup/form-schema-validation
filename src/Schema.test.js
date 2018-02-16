@@ -1588,7 +1588,7 @@ describe('Schema', () => {
             });
 
             schema.addValidator(validatorName, fooValidator);
-            expect(schema.checkValidatorIsRegistered(validatorName)).toEqual(true);
+            expect(schema.isValidatorRegistered(validatorName)).toEqual(true);
         });
         it('should return false if validator is not registred', () => {
             const validatorName = 'fooValidator';
@@ -1601,7 +1601,7 @@ describe('Schema', () => {
                 },
             });
 
-            expect(schema.checkValidatorIsRegistered(validatorName)).toEqual(false);
+            expect(schema.isValidatorRegistered(validatorName)).toEqual(false);
         });
         it('should set error on field in first layer of model', () => {
             const modelSchema = new Schema({
