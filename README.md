@@ -1,22 +1,38 @@
-# SCHEMA
+# FORM SCHEMA VALIDATION
 
 [![Build Status](https://travis-ci.org/rstgroup/form-schema-validation.svg?branch=master)](https://travis-ci.org/rstgroup/form-schema-validation)
 [![Coverage Status](https://coveralls.io/repos/github/rstgroup/form-schema-validation/badge.svg?branch=master)](https://coveralls.io/github/rstgroup/form-schema-validation?branch=master)
 [![npm](https://img.shields.io/npm/l/form-schema-validation.svg)](https://npmjs.org/package/form-schema-validation)
 [![npm](https://img.shields.io/npm/v/form-schema-validation.svg)](https://npmjs.org/package/form-schema-validation)
 
-[1. Installation](#installation)<br />
-[2. How to use](#how-to-use)<br />
-[3. Constructor](#constructor)<br />
-[4. Methods](#methods)<br />
-[5. Types](#types)<br />
-[6. Example of custom validator](#example-of-custom-validator)<br />
-[7. Schema definition Example](#schema-definition-example)<br />
-[8. Example of schema in schema](#example-of-schema-in-schema)<br />
-[9. Schema keys description](#schema-keys-description)<br />
-[10. Custom validation messages](#custom-validation-messages)<br />
-[11. Switch of keys validation](#switch-of-keys-validation)<br />
+[1. Features](#features-of-form-schema-validation)<br />
+[2. Installation](#installation)<br />
+[3. How to use](#how-to-use)<br />
+[4. Constructor](#constructor)<br />
+[5. Methods](#methods)<br />
+[6. Types](#types)<br />
+[7. Example of custom validator](#example-of-custom-validator)<br />
+[8. Example of additional validator](#example-of-additional-validator)<br />
+[9. Schema definition Example](#schema-definition-example)<br />
+[10. Example of schema in schema](#example-of-schema-in-schema)<br />
+[11. Schema keys description](#schema-keys-description)<br />
+[12. Custom validation messages](#custom-validation-messages)<br />
+[13. Switch of keys validation](#switch-of-keys-validation)<br />
 
+### Features of form-schema-validation
+
+- sync validation
+- async validation (Promise)
+- validate object structure
+- validate object keys
+- validate required fields
+- validate as optional
+- validate by type
+- validate by custom type
+- validate by one of type
+- validate field by custom validators
+- validate fields relations by custom validators
+- validate whole object tree by custom additional validators
 
 ### Installation
 
@@ -93,6 +109,8 @@ results.then((errors) => {
 | Name | Attributes | Description |
 |---|---|---|
 | validate | model: Object | Validate Object using defined schema |
+| setError | key: String, message: String, index: Number | Set error on field |
+| setModelError | path: String, message: String | Set error on model tree |
 | getDefaultValues |  | Get default values for model using defined schema |
 | getField | name: String | Get field schema |
 | getField |  | Get all fields schemas |
@@ -101,6 +119,9 @@ results.then((errors) => {
 | omit | fieldsToOmit: [String] | get fields from schema and omit fieldsToOmit |
 | extend | fieldsToExtend: [String] | extend schema by new fields or overwrite them |
 | registerType | type: SchemaType | register new schema type |
+| isValidatorRegistred | validatorName: String | check model validator exists in schema |
+| addValidator | validatorName: String, validator: Function(model: Object, schema: instance of Schema) | add model validator |
+| removeValidator | validatorName: String | remove model validator |
 
 ### Types
 
@@ -130,6 +151,39 @@ const validateIfFieldTitleIsFilled = (minLength, message) => ({
     },
     errorMessage: message
 });
+```
+
+#### Example of additional validator
+Additional validator can set error deep in the objects tree.
+```js
+const fooSchema = new Schema({
+    fooStart: {
+        type: String,
+    },
+    fooEnd: {
+        type: String,
+    },
+});
+const modelSchema = new Schema({
+    foo: {
+        type: fooSchema,
+        required: true,
+    },
+});
+const dataModel = {
+    foo: {
+        fooStart: 'start',
+        fooEnd: 'end',
+    },
+};
+
+modelSchema.addValidator('fooValidator', (model, schema) => {
+    if(model.foo.fooStart === 'start') {
+        schema.setModelError('foo.fooStart', 'errorMessage');
+    }
+});
+
+modelSchema.validate(dataModel);
 ```
 
 ### Example of dynamic error messages
