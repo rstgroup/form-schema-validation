@@ -1666,5 +1666,38 @@ describe('Schema', () => {
                 ],
             });
         });
+        it('should set error on field (async validation)', () => {
+            const fooSchema = new Schema({
+                fooStart: {
+                    type: String,
+                },
+            });
+            const modelSchema = new Schema({
+                foo: {
+                    type: fooSchema,
+                    required: true,
+                },
+            });
+            const data = {
+                foo: {
+                    fooStart: 'start',
+                },
+            };
+
+            modelSchema.addValidator((model, schema) => new Promise((resolve) => {
+                schema.setModelError('foo.fooStart', 'foo error message!');
+                resolve(true);
+            }));
+
+            return modelSchema.validate(data).then((errors) => {
+                expect(errors).toEqual({
+                    foo: [
+                        {
+                            fooStart: ['foo error message!'],
+                        },
+                    ],
+                });
+            });
+        });
     });
 });

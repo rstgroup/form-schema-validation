@@ -247,7 +247,12 @@ class Schema {
     }
 
     validateAdditionalValidators(model) {
-        this.additionalValidators.forEach(validator => validator(model, this));
+        this.additionalValidators.forEach((validator) => {
+            const results = validator(model, this);
+            if (results instanceof Promise) {
+                this.promises.push(results);
+            }
+        });
     }
 
     validateRequired(fieldSchema, value, key) {
