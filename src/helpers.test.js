@@ -199,6 +199,8 @@ describe('helpers', () => {
             const fooFunction = function foo() {};
             Object.defineProperty(fooFunction, 'name', { value: undefined });
             expect(getFunctionName(fooFunction)).toBe('foo');
+            Object.defineProperty(fooFunction, 'name', { value: 'fooName' });
+            expect(getFunctionName(fooFunction)).toBe('fooName');
         });
         it('should return function name of barFunction', () => {
             const barFunction = function bar() {};
