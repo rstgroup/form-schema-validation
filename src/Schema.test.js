@@ -1503,4 +1503,168 @@ describe('Schema', () => {
             expect(schema.getDefaultValues()).toEqual({ foo: 'foo', bar: '' });
         });
     });
+    describe('additionalValidators', () => {
+        it('should add additional validator', () => {
+            const fooValidator = jest.fn();
+            const schema = new Schema({});
+
+            schema.addValidator(fooValidator);
+            expect(schema.additionalValidators.size).toEqual(1);
+        });
+        it('should not add the validator if is not a function', () => {
+            const fooValidator = 'foo';
+            const schema = new Schema({});
+
+            schema.addValidator(fooValidator);
+            expect(schema.additionalValidators.size).toEqual(0);
+        });
+        it('should remove additional validator', () => {
+            const fooValidator = jest.fn();
+            const schema = new Schema({});
+
+            schema.addValidator(fooValidator);
+            schema.removeValidator(fooValidator);
+            expect(schema.additionalValidators.size).toEqual(0);
+        });
+        it('should set error on field in first layer of model', () => {
+            const modelSchema = new Schema({
+                foo: {
+                    type: String,
+                    required: true,
+                },
+            });
+            const data = {
+                foo: 'foo',
+            };
+
+            modelSchema.addValidator((model, schema) => {
+                schema.setModelError('foo', 'foo error message!');
+            });
+
+            expect(modelSchema.validate(data)).toEqual({ foo: ['foo error message!'] });
+        });
+        it('should set error on field in second layer of model', () => {
+            const fooSchema = new Schema({
+                fooStart: {
+                    type: String,
+                },
+            });
+            const modelSchema = new Schema({
+                foo: {
+                    type: fooSchema,
+                    required: true,
+                },
+            });
+            const data = {
+                foo: {
+                    fooStart: 'start',
+                },
+            };
+
+            modelSchema.addValidator((model, schema) => {
+                schema.setModelError('foo.fooStart', 'foo error message!');
+            });
+
+            expect(modelSchema.validate(data)).toEqual({
+                foo: [
+                    {
+                        fooStart: ['foo error message!'],
+                    },
+                ],
+            });
+        });
+        it('should set error on field in third layer of model', () => {
+            const fooBarSchema = new Schema({
+                bar1: {
+                    type: String,
+                },
+                bar2: {
+                    type: String,
+                },
+            });
+            const fooSchema = new Schema({
+                bar: {
+                    type: fooBarSchema,
+                },
+            });
+            const modelSchema = new Schema({
+                foo: {
+                    type: fooSchema,
+                    required: true,
+                },
+            });
+            const data = {
+                foo: {
+                    bar: {
+                        bar1: 'fooBarBar1',
+                        bar2: 'fooBarBar1',
+                    },
+                },
+            };
+
+            modelSchema.addValidator((model, schema) => {
+                schema.setModelError('foo.bar.bar1', 'foo error message!');
+            });
+
+            expect(modelSchema.validate(data)).toEqual({
+                foo: [
+                    {
+                        bar: [
+                            { bar1: ['foo error message!'] },
+                        ],
+                    },
+                ],
+            });
+        });
+        it('should set error on field in third layer of model in specific element in array', () => {
+            const fooBarSchema = new Schema({
+                bar1: {
+                    type: String,
+                },
+                bar2: {
+                    type: String,
+                },
+            });
+            const fooSchema = new Schema({
+                bars: {
+                    type: [fooBarSchema],
+                },
+            });
+            const modelSchema = new Schema({
+                foo: {
+                    type: fooSchema,
+                    required: true,
+                },
+            });
+            const data = {
+                foo: {
+                    bars: [
+                        {
+                            bar1: 'fooBarBar1',
+                            bar2: 'fooBarBar1',
+                        },
+                        {
+                            bar1: 'fooBarBar1',
+                            bar2: '',
+                        },
+                    ],
+                },
+            };
+
+            modelSchema.addValidator((model, schema) => {
+                schema.setModelError('foo.bars.1.bar1', 'foo error message!');
+            });
+
+            expect(modelSchema.validate(data)).toEqual({
+                foo: [
+                    {
+                        bars: [
+                            undefined,
+                            { bar1: ['foo error message!'] },
+                        ],
+                    },
+                ],
+            });
+        });
+    });
 });

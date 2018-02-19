@@ -1,11 +1,13 @@
 import {
     pick,
-    difference,
+    arraysDifference,
     getFieldType,
     getDefaultValueForType,
     getDefaultValueFromOptions,
     wrapToArray,
     getFunctionName,
+    removeFirstKeyIfNumber,
+    getErrorIndexFromKeys,
 } from './helpers';
 import OneOfTypes from './OneOfTypes';
 import SchemaType from './SchemaType';
@@ -50,6 +52,7 @@ class Schema {
         this.schema = schema;
         this.errors = {};
         this.promises = [];
+        this.additionalValidators = new Set();
         this.messages = messages || defaultMessages;
         this.validateKeys = validateKeys;
 
@@ -148,6 +151,21 @@ class Schema {
         this.errors[key].push(message);
     }
 
+    setModelError(path, message) {
+        let error = message;
+        const pathKeys = path.split('.');
+        const [firstKey, ...keys] = pathKeys;
+        const errorIndex = getErrorIndexFromKeys(keys);
+        const field = this.getField(firstKey);
+        const fieldType = getFieldType(field);
+        if (fieldType instanceof Schema) {
+            const childPath = removeFirstKeyIfNumber(keys).join('.');
+            fieldType.setModelError(childPath, message);
+            error = fieldType.errors;
+        }
+        this.setError(firstKey, error, errorIndex);
+    }
+
     checkModel(model) {
         if (!model) {
             this.setError('model', this.messages.modelIsUndefined());
@@ -160,7 +178,7 @@ class Schema {
         if (!this.validateKeys) return;
         const modelKeys = Object.keys(model);
         const schemaKeys = Object.keys(this.schema);
-        const keysDiff = difference(modelKeys, schemaKeys);
+        const keysDiff = arraysDifference(modelKeys, schemaKeys);
         if (keysDiff.length > 0) {
             keysDiff.forEach((key) => {
                 this.setError(key, this.messages.notDefinedKey(key));
@@ -192,6 +210,7 @@ class Schema {
                 key,
             });
         });
+        this.validateAdditionalValidators(model);
     }
 
     resolveValidatorErrorsForKey(key, errorMessage, results) {
@@ -225,6 +244,10 @@ class Schema {
             }
             this.resolveValidatorErrorsForKey(key, errorMessage, results);
         });
+    }
+
+    validateAdditionalValidators(model) {
+        this.additionalValidators.forEach(validator => validator(model, this));
     }
 
     validateRequired(fieldSchema, value, key) {
@@ -409,6 +432,16 @@ class Schema {
         if (requiredValidator) {
             this.typesRequiredValidators[name] = requiredValidator.bind(this);
         }
+    }
+
+    addValidator(validator) {
+        if (typeof validator === 'function') {
+            this.additionalValidators.add(validator);
+        }
+    }
+
+    removeValidator(validator) {
+        this.additionalValidators.delete(validator);
     }
 }
 
