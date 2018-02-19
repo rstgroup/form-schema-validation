@@ -1524,103 +1524,26 @@ describe('Schema', () => {
     });
     describe('additionalValidators', () => {
         it('should add additional validator', () => {
-            const validatorName = 'fooValidator';
             const fooValidator = jest.fn();
-            const schema = new Schema({
-                foo: {
-                    type: String,
-                },
-                bar: {
-                    type: String,
-                },
-            });
+            const schema = new Schema({});
 
-            schema.addValidator(validatorName, fooValidator);
-            expect(schema.additionalValidators).toEqual([
-                {
-                    name: validatorName,
-                    validator: fooValidator,
-                },
-            ]);
+            schema.addValidator(fooValidator);
+            expect(schema.additionalValidators.size).toEqual(1);
         });
-        it('should not add the same additional validator', () => {
-            const validatorName = 'fooValidator';
-            const fooValidator = jest.fn();
-            const schema = new Schema({
-                foo: {
-                    type: String,
-                },
-                bar: {
-                    type: String,
-                },
-            });
+        it('should not add the validator if is not a function', () => {
+            const fooValidator = 'foo';
+            const schema = new Schema({});
 
-            schema.addValidator(validatorName, fooValidator);
-            schema.addValidator(validatorName, fooValidator);
-            expect(schema.additionalValidators).toEqual([
-                {
-                    name: validatorName,
-                    validator: fooValidator,
-                },
-            ]);
+            schema.addValidator(fooValidator);
+            expect(schema.additionalValidators.size).toEqual(0);
         });
         it('should remove additional validator', () => {
-            const validatorName = 'fooValidator';
             const fooValidator = jest.fn();
-            const schema = new Schema({
-                foo: {
-                    type: String,
-                },
-                bar: {
-                    type: String,
-                },
-            });
+            const schema = new Schema({});
 
-            schema.addValidator(validatorName, fooValidator);
-            schema.removeValidator(validatorName);
-            expect(schema.additionalValidators).toEqual([]);
-        });
-        it('should not remove additional validator if not exists', () => {
-            const validatorName = 'fooValidator';
-            const schema = new Schema({
-                foo: {
-                    type: String,
-                },
-                bar: {
-                    type: String,
-                },
-            });
-
-            schema.removeValidator(validatorName);
-            expect(schema.additionalValidators).toEqual([]);
-        });
-        it('should return true if validator is registred', () => {
-            const validatorName = 'fooValidator';
-            const fooValidator = jest.fn();
-            const schema = new Schema({
-                foo: {
-                    type: String,
-                },
-                bar: {
-                    type: String,
-                },
-            });
-
-            schema.addValidator(validatorName, fooValidator);
-            expect(schema.isValidatorRegistered(validatorName)).toEqual(true);
-        });
-        it('should return false if validator is not registred', () => {
-            const validatorName = 'fooValidator';
-            const schema = new Schema({
-                foo: {
-                    type: String,
-                },
-                bar: {
-                    type: String,
-                },
-            });
-
-            expect(schema.isValidatorRegistered(validatorName)).toEqual(false);
+            schema.addValidator(fooValidator);
+            schema.removeValidator(fooValidator);
+            expect(schema.additionalValidators.size).toEqual(0);
         });
         it('should set error on field in first layer of model', () => {
             const modelSchema = new Schema({
@@ -1628,27 +1551,20 @@ describe('Schema', () => {
                     type: String,
                     required: true,
                 },
-                bar: {
-                    type: String,
-                },
             });
             const data = {
                 foo: 'foo',
-                bar: 'bar',
             };
 
-            modelSchema.addValidator('fooValidator', (model, schema) => {
-                schema.setModelError('foo', 'errorMessage');
+            modelSchema.addValidator((model, schema) => {
+                schema.setModelError('foo', 'foo error message!');
             });
 
-            expect(modelSchema.validate(data)).toEqual({ foo: ['errorMessage'] });
+            expect(modelSchema.validate(data)).toEqual({ foo: ['foo error message!'] });
         });
         it('should set error on field in second layer of model', () => {
             const fooSchema = new Schema({
                 fooStart: {
-                    type: String,
-                },
-                fooEnd: {
                     type: String,
                 },
             });
@@ -1661,18 +1577,17 @@ describe('Schema', () => {
             const data = {
                 foo: {
                     fooStart: 'start',
-                    fooEnd: 'end',
                 },
             };
 
-            modelSchema.addValidator('fooValidator', (model, schema) => {
-                schema.setModelError('foo.fooStart', 'errorMessage');
+            modelSchema.addValidator((model, schema) => {
+                schema.setModelError('foo.fooStart', 'foo error message!');
             });
 
             expect(modelSchema.validate(data)).toEqual({
                 foo: [
                     {
-                        fooStart: ['errorMessage'],
+                        fooStart: ['foo error message!'],
                     },
                 ],
             });
@@ -1706,15 +1621,15 @@ describe('Schema', () => {
                 },
             };
 
-            modelSchema.addValidator('fooValidator', (model, schema) => {
-                schema.setModelError('foo.bar.bar1', 'errorMessage');
+            modelSchema.addValidator((model, schema) => {
+                schema.setModelError('foo.bar.bar1', 'foo error message!');
             });
 
             expect(modelSchema.validate(data)).toEqual({
                 foo: [
                     {
                         bar: [
-                            { bar1: ['errorMessage'] },
+                            { bar1: ['foo error message!'] },
                         ],
                     },
                 ],
@@ -1755,8 +1670,8 @@ describe('Schema', () => {
                 },
             };
 
-            modelSchema.addValidator('fooValidator', (model, schema) => {
-                schema.setModelError('foo.bars.1.bar1', 'errorMessage');
+            modelSchema.addValidator((model, schema) => {
+                schema.setModelError('foo.bars.1.bar1', 'foo error message!');
             });
 
             expect(modelSchema.validate(data)).toEqual({
@@ -1764,7 +1679,7 @@ describe('Schema', () => {
                     {
                         bars: [
                             undefined,
-                            { bar1: ['errorMessage'] },
+                            { bar1: ['foo error message!'] },
                         ],
                     },
                 ],

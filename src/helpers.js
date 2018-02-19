@@ -6,7 +6,7 @@ export const pick = (object, keys) => {
     return pickedObject;
 };
 
-export const difference = (keys, compareKeys) => {
+export const arraysDifference = (keys, compareKeys) => {
     const differenceBetweanObjects = [];
     keys.forEach((key) => {
         if (compareKeys.indexOf(key) < 0) differenceBetweanObjects.push(key);
@@ -59,9 +59,13 @@ export const getFunctionName = (type) => {
     return typeName;
 };
 
+/* eslint-disable */
+export const isNaN = value => typeof value === 'number' && value !== value;
+/* eslint-enable */
+
 export const removeFirstKeyIfNumber = (keys) => {
     const firstKey = parseInt(keys[0], 10);
-    if (Number.isInteger(firstKey)) {
+    if (!isNaN(firstKey)) {
         keys.splice(0, 1);
     }
     return keys;
@@ -69,7 +73,7 @@ export const removeFirstKeyIfNumber = (keys) => {
 
 export const getErrorIndexFromKeys = (keys) => {
     const firstKey = parseInt(keys[0], 10);
-    if (Number.isInteger(firstKey)) {
+    if (!isNaN(firstKey)) {
         return firstKey;
     }
     return -1;
