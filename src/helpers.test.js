@@ -6,6 +6,7 @@ import {
     getDefaultValueForType,
     getDefaultValueFromOptions,
     getFunctionName,
+    isNaN,
     removeFirstKeyIfNumber,
     getErrorIndexFromKeys,
 } from './helpers';
@@ -134,6 +135,45 @@ describe('helpers', () => {
             };
 
             expect(getFieldType(fooField)).toBe(String);
+        });
+    });
+    describe('isNaN', () => {
+        it('should return true if value is NaN', () => {
+            const value = NaN;
+
+            expect(isNaN(value)).toEqual(true);
+        });
+        it('should return false if value is String', () => {
+            const value = 'NaN';
+            const emptyValue = '';
+
+            expect(isNaN(value)).toEqual(false);
+            expect(isNaN(emptyValue)).toEqual(false);
+        });
+        it('should return false if value is Number', () => {
+            const value = 0;
+
+            expect(isNaN(value)).toEqual(false);
+        });
+        it('should return false if value is Object', () => {
+            const value = {};
+
+            expect(isNaN(value)).toEqual(false);
+        });
+        it('should return false if value is Array', () => {
+            const value = [];
+
+            expect(isNaN(value)).toEqual(false);
+        });
+        it('should return false if value is Boolean', () => {
+            const value = false;
+
+            expect(isNaN(value)).toEqual(false);
+        });
+        it('should return false if value is Function', () => {
+            const value = () => {};
+
+            expect(isNaN(value)).toEqual(false);
         });
     });
     describe('getFunctionName', () => {
