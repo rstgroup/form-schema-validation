@@ -93,7 +93,7 @@ export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
     errorKeys.forEach((key) => {
         const current = currentErrors[key] || [];
         const next = nextErrors[key] || [];
-        errors[key] = [...current, ...next];
+        errors[key] = [...wrapToArray(current, true), ...wrapToArray(next, true)];
     });
     return errors;
 };
