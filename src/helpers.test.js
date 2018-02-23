@@ -250,5 +250,15 @@ describe('helpers', () => {
             const nextErrors = undefined;
             expect(mergeErrors(currentErrors, nextErrors)).toEqual({});
         });
+        it('should return array with errors if next error is string', () => {
+            const currentErrors = ['foo error'];
+            const nextErrors = 'bar error';
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(['foo error', 'bar error']);
+        });
+        it('should return array with error if next error is string and current error is undefined', () => {
+            const currentErrors = undefined;
+            const nextErrors = 'bar error';
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(['bar error']);
+        });
     });
 });
