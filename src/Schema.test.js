@@ -1685,5 +1685,131 @@ describe('Schema', () => {
                 ],
             });
         });
+        it('should merge errors if error is set on the same key and index', () => {
+            const unitSchema = new Schema({
+                value: {
+                    type: String,
+                    required: true,
+                },
+                unit: {
+                    type: String,
+                    required: true,
+                },
+            });
+            const elementSchema = new Schema({
+                name: {
+                    type: String,
+                },
+                type: {
+                    type: String,
+                },
+                height: {
+                    type: unitSchema,
+                },
+                weight: {
+                    type: unitSchema,
+                },
+                length: {
+                    type: unitSchema,
+                },
+            });
+            const modelSchema = new Schema({
+                elements: {
+                    type: [elementSchema],
+                },
+            });
+            const data = {
+                elements: [
+                    {
+                        name: 'test',
+                        type: 'pallet',
+                        height: {
+                            value: '10',
+                            unit: 'm',
+                        },
+                        weight: {
+                            value: '10',
+                            unit: 'm',
+                        },
+                        length: {
+                            value: '10',
+                            unit: 'm',
+                        },
+                    },
+                    {
+                        name: 'test',
+                        type: 'pallet',
+                        height: {
+                            value: '',
+                            unit: 'm',
+                        },
+                        weight: {
+                            value: '10',
+                            unit: 'm',
+                        },
+                        length: {
+                            value: '10',
+                            unit: 'm',
+                        },
+                    },
+                    {
+                        name: 'test1',
+                        type: 'pallet',
+                        height: {
+                            value: '',
+                            unit: 'm',
+                        },
+                        weight: {
+                            value: '',
+                            unit: 'm',
+                        },
+                        length: {
+                            value: '10',
+                            unit: 'm',
+                        },
+                    },
+                ],
+            };
+
+            modelSchema.addValidator((model, schema) => {
+                if (!model || !Array.isArray(model.elements)) return;
+                const uniqueNames = new Set();
+                const errorMsg = 'duplicatedKey';
+
+                model.elements.forEach((element, index) => {
+                    if (uniqueNames.has(element.name)) {
+                        schema.setModelError(`elements.${index}.name`, errorMsg);
+                    } else {
+                        uniqueNames.add(element.name);
+                    }
+                });
+            });
+
+            expect(modelSchema.validate(data)).toEqual({
+                elements: [
+                    undefined,
+                    {
+                        name: ['duplicatedKey'],
+                        height: [
+                            {
+                                value: ["Field 'value' is required"],
+                            },
+                        ],
+                    },
+                    {
+                        height: [
+                            {
+                                value: ["Field 'value' is required"],
+                            },
+                        ],
+                        weight: [
+                            {
+                                value: ["Field 'value' is required"],
+                            },
+                        ],
+                    },
+                ],
+            });
+        });
     });
 });

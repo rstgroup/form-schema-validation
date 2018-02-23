@@ -8,6 +8,7 @@ import {
     getFunctionName,
     removeFirstKeyIfNumber,
     getErrorIndexFromKeys,
+    mergeErrors,
 } from './helpers';
 import OneOfTypes from './OneOfTypes';
 import SchemaType from './SchemaType';
@@ -142,13 +143,13 @@ class Schema {
         return this.errors;
     }
 
-    setError(key, message, index) {
+    setError(key, error, index) {
         if (!this.errors[key]) this.errors[key] = [];
         if (index > -1) {
-            this.errors[key][index] = message;
+            this.errors[key][index] = mergeErrors(error, this.errors[key][index]);
             return;
         }
-        this.errors[key].push(message);
+        this.errors[key].push(error);
     }
 
     setModelError(path, message) {
@@ -159,9 +160,10 @@ class Schema {
         const field = this.getField(firstKey);
         const fieldType = getFieldType(field);
         if (fieldType instanceof Schema) {
+            const virtualSchema = new Schema(fieldType.schema);
             const childPath = removeFirstKeyIfNumber(keys).join('.');
-            fieldType.setModelError(childPath, message);
-            error = fieldType.errors;
+            virtualSchema.setModelError(childPath, message);
+            error = virtualSchema.errors;
         }
         this.setError(firstKey, error, errorIndex);
     }

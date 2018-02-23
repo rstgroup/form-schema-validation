@@ -78,3 +78,16 @@ export const getErrorIndexFromKeys = (keys) => {
     }
     return -1;
 };
+
+export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
+    const errors = {};
+    const errorKeys = new Set();
+    Object.keys(currentErrors).forEach(key => errorKeys.add(key));
+    Object.keys(nextErrors).forEach(key => errorKeys.add(key));
+    errorKeys.forEach((key) => {
+        const current = currentErrors[key] || [];
+        const next = nextErrors[key] || [];
+        errors[key] = [...current, ...next];
+    });
+    return errors;
+};
