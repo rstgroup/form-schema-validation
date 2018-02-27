@@ -229,36 +229,115 @@ describe('helpers', () => {
         });
     });
     describe('mergeErrors', () => {
-        it('should return error with 2 keys', () => {
-            const currentErrors = { foo: ['foo error 1', 'foo error 2'] };
-            const nextErrors = { bar: ['bar error 1', 'bar error 2'] };
-            expect(mergeErrors(currentErrors, nextErrors)).toEqual({
-                foo: ['foo error 1', 'foo error 2'],
-                bar: ['bar error 1', 'bar error 2'],
-            });
+        it('should merge objects with props as arrays of errors', () => {
+            const currentErrors = {
+                foo: ['foo 1', 'foo 2'],
+            };
+            const nextErrors = {
+                bar: ['bar 1', 'bar 2'],
+            };
+            const expected = {
+                foo: ['foo 1', 'foo 2'],
+                bar: ['bar 1', 'bar 2'],
+            };
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
         });
-        it('should return error with 2 keys', () => {
-            const currentErrors = { foo: ['foo error 1', 'foo error 2'], bar: ['bar error 3'] };
-            const nextErrors = { bar: ['bar error 1', 'bar error 2'] };
-            expect(mergeErrors(currentErrors, nextErrors)).toEqual({
-                foo: ['foo error 1', 'foo error 2'],
-                bar: ['bar error 3', 'bar error 1', 'bar error 2'],
-            });
+        it('should merge list of errors with given props', () => {
+            const currentErrors = {
+                foo: ['foo 1', 'foo 2'],
+                bar: ['bar 3'],
+            };
+            const nextErrors = {
+                bar: ['bar 1', 'bar 2'],
+            };
+            const expected = {
+                foo: ['foo 1', 'foo 2'],
+                bar: ['bar 1', 'bar 2'],
+            };
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
         });
-        it('should return empty object if errors are undefined', () => {
+        it('should override current errors of next is a string', () => {
+            const currentErrors = {
+                foo: ['foo 1', 'foo 2'],
+            };
+            const nextErrors = 'bar';
+            const expected = ['bar'];
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should not override current errors if next is an empty object', () => {
+            const currentErrors = {
+                foo: ['foo 1', 'foo 2'],
+            };
+            const nextErrors = {};
+            const expected = { ...currentErrors };
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should return an empty object if errors are undefined', () => {
             const currentErrors = undefined;
             const nextErrors = undefined;
-            expect(mergeErrors(currentErrors, nextErrors)).toEqual({});
+            const expected = {};
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
         });
-        it('should return array with errors if next error is string', () => {
-            const currentErrors = ['foo error'];
-            const nextErrors = 'bar error';
-            expect(mergeErrors(currentErrors, nextErrors)).toEqual(['foo error', 'bar error']);
+        it('should return an empty object if errors are nulls', () => {
+            const currentErrors = null;
+            const nextErrors = null;
+            const expected = {};
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
         });
-        it('should return array with error if next error is string and current error is undefined', () => {
+        it('should return an empty object if errors are null and undefined respectively', () => {
+            const currentErrors = null;
+            const nextErrors = undefined;
+            const expected = {};
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should return an array with errors if next error is string and current is an array', () => {
+            const currentErrors = ['foo'];
+            const nextErrors = 'bar';
+            const expected = ['bar'];
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should return an array with error if next is a string and current is undefined', () => {
             const currentErrors = undefined;
-            const nextErrors = 'bar error';
-            expect(mergeErrors(currentErrors, nextErrors)).toEqual(['bar error']);
+            const nextErrors = 'bar';
+            const expected = ['bar'];
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should return an array with error if next is null and current is a string', () => {
+            const currentErrors = 'foo';
+            const nextErrors = null;
+            const expected = ['foo'];
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should return an array with error if next is a string and current is null', () => {
+            const currentErrors = null;
+            const nextErrors = 'bar';
+            const expected = ['bar'];
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should return next errors as array if current is an array', () => {
+            const currentErrors = [];
+            const nextErrors = { foo: 'foo 1' };
+            const expected = [{ foo: 'foo 1' }];
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should keep errors indices', () => {
+            const currErrors = ['foo 1', undefined, 'foo 3', undefined, undefined];
+            const nextErrors = ['bar 1', undefined, undefined, 'bar 4'];
+            const expected = ['bar 1', undefined, 'foo 3', 'bar 4'];
+
+            expect(mergeErrors(currErrors, nextErrors)).toEqual(expected);
         });
     });
 });
