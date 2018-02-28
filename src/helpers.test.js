@@ -258,12 +258,21 @@ describe('helpers', () => {
 
             expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
         });
-        it('should override current errors of next is a string', () => {
+        it('should override current errors if next is a string', () => {
             const currentErrors = {
                 foo: ['foo 1', 'foo 2'],
             };
             const nextErrors = 'bar';
             const expected = ['bar'];
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should override current errors if next is an array of strings', () => {
+            const currentErrors = {
+                foo: ['foo 1', 'foo 2'],
+            };
+            const nextErrors = ['bar 1'];
+            const expected = ['bar 1'];
 
             expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
         });
@@ -329,6 +338,22 @@ describe('helpers', () => {
             const currentErrors = [];
             const nextErrors = { foo: 'foo 1' };
             const expected = [{ foo: 'foo 1' }];
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should return next errors wrapped in array if one of previous params is an array', () => {
+            const currentErrors = [{
+                foo: ['foo 1'],
+            }];
+            const nextErrors = { foo: 'foo 2' };
+            const expected = [{ foo: 'foo 2' }];
+
+            expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
+        });
+        it('should replace one of current errors if current is an array of strings and next is an object', () => {
+            const currentErrors = ['foo 1', 'foo 2'];
+            const nextErrors = { foo: 'foo 3' };
+            const expected = [{ foo: 'foo 3' }, 'foo 2'];
 
             expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
         });

@@ -78,7 +78,7 @@ export const getErrorIndexFromKeys = (keys) => {
     return -1;
 };
 
-const hasNoProps = (obj) => {
+const isObjectWithoutProps = (obj) => {
     if (obj === null) {
         return true;
     }
@@ -115,7 +115,7 @@ const mergeErrorsLists = (a, b) => {
 
     for (let i = 0; i < maxLength; i += 1) {
         const value = b[i] || a[i];
-        if (value && !hasNoProps(value)) {
+        if (value && !isObjectWithoutProps(value)) {
             merged[i] = value;
         }
     }
@@ -127,10 +127,10 @@ const mergeObjectsErrors = (currentErrors, nextErrors) => {
     const errors = {};
     const errorKeys = new Set();
 
-    if (!hasNoProps(currentErrors)) {
+    if (!isObjectWithoutProps(currentErrors)) {
         Object.keys(currentErrors).forEach(key => errorKeys.add(key));
     }
-    if (!hasNoProps(nextErrors)) {
+    if (!isObjectWithoutProps(nextErrors)) {
         Object.keys(nextErrors).forEach(key => errorKeys.add(key));
     }
 
@@ -144,7 +144,7 @@ const mergeObjectsErrors = (currentErrors, nextErrors) => {
 };
 
 export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
-    if (hasNoProps(currentErrors) && hasNoProps(nextErrors)) {
+    if (isObjectWithoutProps(currentErrors) && isObjectWithoutProps(nextErrors)) {
         return {};
     }
 
