@@ -70,22 +70,24 @@ export default class Schema {
 
         this.validateTypeSchema = this.validateTypeSchema.bind(this);
 
+        const handler = this.handleTypeValidation;
+
         this.typesValidators = {
-            Array: this.handleTypeValidation.bind(this, validateArray),
-            Boolean: this.handleTypeValidation.bind(this, validateBoolean),
-            Date: this.handleTypeValidation.bind(this, validateDate),
-            Number: this.handleTypeValidation.bind(this, validateNumber),
-            Object: this.handleTypeValidation.bind(this, validateObject),
-            String: this.handleTypeValidation.bind(this, validateString),
+            Array: handler.bind(this, validateArray, this.messages.validateArray),
+            Boolean: handler.bind(this, validateBoolean, this.messages.validateBoolean),
+            Date: handler.bind(this, validateDate, this.messages.validateDate),
+            Number: handler.bind(this, validateNumber, this.messages.validateNumber),
+            Object: handler.bind(this, validateObject, this.messages.validateObject),
+            String: handler.bind(this, validateString, this.messages.validateString),
         };
 
         this.typesRequiredValidators = {
-            Array: this.handleTypeRequirement.bind(this, validateRequiredArray),
-            Boolean: this.handleTypeRequirement.bind(this, validateRequiredBoolean),
-            Date: this.handleTypeRequirement.bind(this, validateRequiredDate),
-            Number: this.handleTypeRequirement.bind(this, validateRequiredNumber),
-            Object: this.handleTypeRequirement.bind(this, validateRequiredObject),
-            String: this.handleTypeRequirement.bind(this, validateRequiredString),
+            Array: handler.bind(this, validateRequiredArray, this.messages.validateRequired),
+            Boolean: handler.bind(this, validateRequiredBoolean, this.messages.validateRequired),
+            Date: handler.bind(this, validateRequiredDate, this.messages.validateRequired),
+            Number: handler.bind(this, validateRequiredNumber, this.messages.validateRequired),
+            Object: handler.bind(this, validateRequiredObject, this.messages.validateRequired),
+            String: handler.bind(this, validateRequiredString, this.messages.validateRequired),
         };
     }
 
@@ -262,19 +264,7 @@ export default class Schema {
             this.validateRequiredTypeSchema(fieldSchema.type.schema, value, key);
             return;
         }
-        this.handleTypeRequirement(validateRequired, value, key);
-    }
-
-    handleTypeRequirement(validate, value, key) {
-        if (typeof validate !== 'function') {
-            throw new Error('Uknown requirement validator');
-        }
-        const result = validate(value);
-        if (!result) {
-            const { label } = this.getField(key);
-            this.setError(key, this.messages.validateRequired(label || key));
-        }
-        return result;
+        this.handleTypeValidation(validateRequired, this.messages.validateRequired, value, key);
     }
 
     validateRequiredTypeSchema(schema, value, key) {
@@ -310,14 +300,14 @@ export default class Schema {
         throw new Error(`Unrecognized type ${typeName}`);
     }
 
-    handleTypeValidation(validate, value, key, index) {
+    handleTypeValidation(validate, createErrorMessage, value, key, index) {
         if (typeof validate !== 'function') {
             throw new Error('Uknown validator');
         }
         const result = validate(value);
         if (!result) {
             const { label } = this.getField(key);
-            this.setError(key, this.messages.validateString(label || key), index);
+            this.setError(key, createErrorMessage(label || key), index);
         }
         return result;
     }
