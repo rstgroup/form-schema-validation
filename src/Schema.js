@@ -10,7 +10,15 @@ import {
     getErrorIndexFromKeys,
     mergeErrors,
 } from './helpers';
-import OneOfTypes from './OneOfTypes';
+
+import validateArray from './validators/array';
+import validateBoolean from './validators/boolean';
+import validateDate from './validators/date';
+import validateNumber from './validators/number';
+import validateObject from './validators/object';
+import validateString from './validators/string';
+
+import OneOfTypes from './operators/OneOfTypes';
 import SchemaType from './SchemaType';
 
 const defaultMessages = {
@@ -24,6 +32,19 @@ const defaultMessages = {
     validateBoolean(fieldName) { return `Field '${fieldName}' is not a Boolean`; },
     validateDate(fieldName) { return `Field '${fieldName}' is not a Date`; },
 };
+
+const handleTypeValidation = (validatorName, schema, value, key, index) => {
+    const validate = schema.validators[validatorName];
+    if (typeof validate !== 'function') {
+        throw new Error(`Uknown "${validatorName}" validator`);
+    }
+    const result = validate(value);
+    if (!result) {
+        const { label } = schema.getField(key);
+        schema.setError(key, schema.messages.validateString(label || key), index);
+    }
+    return result;
+}
 
 class Schema {
     static oneOfTypes(types) {
@@ -56,6 +77,15 @@ class Schema {
         this.additionalValidators = new Set();
         this.messages = { ...defaultMessages, ...messages };
         this.validateKeys = validateKeys;
+
+        this.validators = {
+            validateArray,
+            validateBoolean,
+            validateDate,
+            validateNumber,
+            validateObject,
+            validateString,
+        };
 
         this.validateTypeString = this.validateTypeString.bind(this);
         this.validateTypeNumber = this.validateTypeNumber.bind(this);
@@ -344,45 +374,39 @@ class Schema {
     }
 
     validateTypeString(value, key, index) {
-        if (typeof value === 'string') return true;
-        const { label } = this.getField(key);
-        this.setError(key, this.messages.validateString(label || key), index);
-        return false;
+        const schema = this;
+        const validatorName = 'validateString';
+        return handleTypeValidation(validatorName, schema, value, key, index);
     }
 
     validateTypeNumber(value, key, index) {
-        if (typeof value === 'number') return true;
-        const { label } = this.getField(key);
-        this.setError(key, this.messages.validateNumber(label || key), index);
-        return false;
+        const schema = this;
+        const validatorName = 'validateNumber';
+        return handleTypeValidation(validatorName, schema, value, key, index);
     }
 
     validateTypeObject(value, key, index) {
-        if (typeof value === 'object' && !Array.isArray(value) && value !== null) return true;
-        const { label } = this.getField(key);
-        this.setError(key, this.messages.validateObject(label || key), index);
-        return false;
+        const schema = this;
+        const validatorName = 'validateObject';
+        return handleTypeValidation(validatorName, schema, value, key, index);
     }
 
     validateTypeArray(value, key, index) {
-        if (Array.isArray(value)) return true;
-        const { label } = this.getField(key);
-        this.setError(key, this.messages.validateArray(label || key), index);
-        return false;
+        const schema = this;
+        const validatorName = 'validateArray';
+        return handleTypeValidation(validatorName, schema, value, key, index);
     }
 
     validateTypeBoolean(value, key, index) {
-        if (typeof value === 'boolean') return true;
-        const { label } = this.getField(key);
-        this.setError(key, this.messages.validateBoolean(label || key), index);
-        return false;
+        const schema = this;
+        const validatorName = 'validateBoolean';
+        return handleTypeValidation(validatorName, schema, value, key, index);
     }
 
     validateTypeDate(value, key, index) {
-        if (value instanceof Date) return true;
-        const { label } = this.getField(key);
-        this.setError(key, this.messages.validateDate(label || key), index);
-        return false;
+        const schema = this;
+        const validatorName = 'validateDate';
+        return handleTypeValidation(validatorName, schema, value, key, index);
     }
 
     validateTypeSchema(value, subSchemaKey, type, index) {
