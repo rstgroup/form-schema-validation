@@ -160,9 +160,11 @@ export default class Schema {
     validate(model) {
         this.errors = {};
         this.promises = [];
-        if (this.checkModel(model)) {
-            this.checkKeysDiff(model);
+        if (model) {
+            this.handleModelKeysNotDefinedInSchema(model);
             this.checkTypesAndValidators(model);
+        } else {
+            this.setMissingModelError();
         }
         if (this.promises.length > 0) {
             return Promise.all(this.promises).then(() => this.errors);
@@ -195,24 +197,22 @@ export default class Schema {
         this.setError(firstKey, error, errorIndex);
     }
 
-    checkModel(model) {
-        if (!model) {
-            this.setError('model', this.messages.modelIsUndefined());
-            return false;
-        }
-        return true;
+    setMissingModelError() {
+        const errorMessage = this.messages.modelIsUndefined();
+        this.setError('model', errorMessage);
     }
 
-    checkKeysDiff(model) {
-        if (!this.validateKeys) return;
+    handleModelKeysNotDefinedInSchema(model) {
+        if (!this.validateKeys) {
+            return;
+        }
         const modelKeys = Object.keys(model);
         const schemaKeys = Object.keys(this.schema);
         const keysDiff = arraysDifference(modelKeys, schemaKeys);
-        if (keysDiff.length > 0) {
-            keysDiff.forEach((key) => {
-                this.setError(key, this.messages.notDefinedKey(key));
-            });
-        }
+        keysDiff.forEach((key) => {
+            const errorMessage = this.messages.notDefinedKey(key);
+            this.setError(key, errorMessage);
+        });
     }
 
     checkTypesAndValidators(model) {

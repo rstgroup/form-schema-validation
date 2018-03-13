@@ -6,13 +6,9 @@ export const pick = (object, keys) => {
     return pickedObject;
 };
 
-export const arraysDifference = (keys, compareKeys) => {
-    const differenceBetweanObjects = [];
-    keys.forEach((key) => {
-        if (compareKeys.indexOf(key) < 0) differenceBetweanObjects.push(key);
-    });
-    return differenceBetweanObjects;
-};
+export const includes = (array, value) => array.indexOf(value) < 0;
+
+export const arraysDifference = (array, values) => array.filter(key => includes(values, key));
 
 export const wrapToArray = (value) => {
     if (Array.isArray(value)) {
