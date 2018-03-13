@@ -17,6 +17,13 @@ import validateDate from './validators/date';
 import validateNumber from './validators/number';
 import validateObject from './validators/object';
 import validateString from './validators/string';
+import validateRequired from './validators/required';
+import validateRequiredObject from './validators/requiredObject';
+import validateRequiredArray from './validators/requiredArray';
+import validateRequiredNumber from './validators/requiredNumber';
+import validateRequiredDate from './validators/requiredDate';
+import validateRequiredString from './validators/requiredString';
+import validateRequiredBoolean from './validators/requiredBoolean';
 
 import OrOperator from './operators/OrOperator';
 import SchemaType from './SchemaType';
@@ -62,11 +69,6 @@ export default class Schema {
         this.validateKeys = validateKeys;
 
         this.validateTypeSchema = this.validateTypeSchema.bind(this);
-        this.validateRequiredType = this.validateRequiredType.bind(this);
-        this.validateRequiredTypeObject = this.validateRequiredTypeObject.bind(this);
-        this.validateRequiredTypeDate = this.validateRequiredTypeDate.bind(this);
-        this.validateRequiredTypeNumber = this.validateRequiredTypeNumber.bind(this);
-        this.validateRequiredTypeArray = this.validateRequiredTypeArray.bind(this);
 
         this.typesValidators = {
             Array: this.handleTypeValidation.bind(this, validateArray),
@@ -78,12 +80,12 @@ export default class Schema {
         };
 
         this.typesRequiredValidators = {
-            String: this.validateRequiredType,
-            Number: this.validateRequiredTypeNumber,
-            Object: this.validateRequiredTypeObject,
-            Array: this.validateRequiredTypeArray,
-            Boolean: this.validateRequiredType,
-            Date: this.validateRequiredTypeDate,
+            Array: this.handleTypeRequirement.bind(this, validateRequiredArray),
+            Boolean: this.handleTypeRequirement.bind(this, validateRequiredBoolean),
+            Date: this.handleTypeRequirement.bind(this, validateRequiredDate),
+            Number: this.handleTypeRequirement.bind(this, validateRequiredNumber),
+            Object: this.handleTypeRequirement.bind(this, validateRequiredObject),
+            String: this.handleTypeRequirement.bind(this, validateRequiredString),
         };
     }
 
@@ -248,56 +250,31 @@ export default class Schema {
     }
 
     validateRequired(fieldSchema, value, key) {
-        if (fieldSchema.required) {
-            const { name } = fieldSchema.type;
-            if (typeof this.typesRequiredValidators[name] === 'function') {
-                this.typesRequiredValidators[name](value, key);
-                return;
-            }
-            if (fieldSchema.type instanceof Schema) {
-                this.validateRequiredTypeSchema(fieldSchema.type.schema, value, key);
-                return;
-            }
-            this.validateRequiredType(value, key);
+        if (!fieldSchema.required) {
+            return;
         }
+        const { name } = fieldSchema.type;
+        if (typeof this.typesRequiredValidators[name] === 'function') {
+            this.typesRequiredValidators[name](value, key);
+            return;
+        }
+        if (fieldSchema.type instanceof Schema) {
+            this.validateRequiredTypeSchema(fieldSchema.type.schema, value, key);
+            return;
+        }
+        this.handleTypeRequirement(validateRequired, value, key);
     }
 
-    validateRequiredType(value, key) {
-        if (!value || value.length === 0) {
+    handleTypeRequirement(validate, value, key) {
+        if (typeof validate !== 'function') {
+            throw new Error('Uknown requirement validator');
+        }
+        const result = validate(value);
+        if (!result) {
             const { label } = this.getField(key);
             this.setError(key, this.messages.validateRequired(label || key));
         }
-    }
-
-    validateRequiredTypeObject(value, key) {
-        if (typeof value === 'object' && value !== null && Object.keys(value).length > 0) {
-            return;
-        }
-        const { label } = this.getField(key);
-        this.setError(key, this.messages.validateRequired(label || key));
-    }
-
-    validateRequiredTypeArray(value, key) {
-        if (Array.isArray(value) && value.length > 0) {
-            return;
-        }
-        const { label } = this.getField(key);
-        this.setError(key, this.messages.validateRequired(label || key));
-    }
-
-    validateRequiredTypeNumber(value, key) {
-        if (typeof value !== 'number' || Number.isNaN(value)) {
-            const { label } = this.getField(key);
-            this.setError(key, this.messages.validateRequired(label || key));
-        }
-    }
-
-    validateRequiredTypeDate(value, key) {
-        if (value instanceof Date) {
-            return;
-        }
-        const { label } = this.getField(key);
-        this.setError(key, this.messages.validateRequired(label || key));
+        return result;
     }
 
     validateRequiredTypeSchema(schema, value, key) {
