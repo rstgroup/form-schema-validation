@@ -27,6 +27,8 @@ import validateRequiredBoolean from './validators/requiredBoolean';
 
 import OrOperator from './operators/OrOperator';
 import SchemaType from './SchemaType';
+import Field from './Field';
+
 import * as defaultErrorMessages from './defaultErrorMessages';
 
 export const operators = {
@@ -67,7 +69,7 @@ export default class Schema {
         this.additionalValidators = new Set();
         this.messages = { ...defaultErrorMessages, ...messages };
         this.validateKeys = validateKeys;
-
+        this.fields = Field.createFieldsFromRawSchema(schema);
         this.validateTypeSchema = this.validateTypeSchema.bind(this);
 
         const handler = this.handleTypeValidation;
