@@ -20,18 +20,7 @@ import validateString from './validators/string';
 
 import OrOperator from './operators/OrOperator';
 import SchemaType from './SchemaType';
-
-const defaultMessages = {
-    notDefinedKey(fieldName) { return `Key '${fieldName}' is not defined in schema`; },
-    modelIsUndefined() { return 'Validated model is undefined'; },
-    validateRequired(fieldName) { return `Field '${fieldName}' is required`; },
-    validateString(fieldName) { return `Field '${fieldName}' is not a String`; },
-    validateNumber(fieldName) { return `Field '${fieldName}' is not a Number`; },
-    validateObject(fieldName) { return `Field '${fieldName}' is not a Object`; },
-    validateArray(fieldName) { return `Field '${fieldName}' is not a Array`; },
-    validateBoolean(fieldName) { return `Field '${fieldName}' is not a Boolean`; },
-    validateDate(fieldName) { return `Field '${fieldName}' is not a Date`; },
-};
+import * as defaultErrorMessages from './defaultErrorMessages';
 
 const handleTypeValidation = (validatorName, schema, value, key, index) => {
     const validate = schema.validators[validatorName];
@@ -83,7 +72,7 @@ export default class Schema {
         this.errors = {};
         this.promises = [];
         this.additionalValidators = new Set();
-        this.messages = { ...defaultMessages, ...messages };
+        this.messages = { ...defaultErrorMessages, ...messages };
         this.validateKeys = validateKeys;
 
         this.validators = {
