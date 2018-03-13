@@ -1,223 +1,256 @@
+import size from 'lodash/size';
+
 import Schema from './Schema';
 import SchemaType from './SchemaType';
 
 describe('Schema', () => {
-    describe('Validation types', () => {
-        it('should validate String', () => {
-            const schema = new Schema({
-                companyName: {
-                    type: String,
-                },
-            });
-            const testObject = {
-                companyName: 'Test Company',
-            };
-
-            const testObject2 = {
-                companyName: 2345,
-            };
-
-            const testObjectErrors = schema.validate(testObject);
-            const testObject2Errors = schema.validate(testObject2);
-            expect(Object.keys(testObjectErrors).length).toBe(0);
-            expect(Object.keys(testObject2Errors).length).toBe(1);
-        });
-
-        it('should validate Number', () => {
-            const schema = new Schema({
-                companyNumber: {
-                    type: Number,
-                },
-            });
-
-            const testObject = {
-                companyNumber: 2345,
-            };
-
-            const testObject2 = {
-                companyNumber: 'Test Company',
-            };
-
-            const testObjectErrors = schema.validate(testObject);
-            const testObject2Errors = schema.validate(testObject2);
-            expect(Object.keys(testObjectErrors).length).toBe(0);
-            expect(Object.keys(testObject2Errors).length).toBe(1);
-        });
-
-        it('should validate Boolean', () => {
-            const schema = new Schema({
-                isActive: {
-                    type: Boolean,
-                },
-            });
-
-            const testObject = {
-                isActive: true,
-            };
-
-            const testObject2 = {
-                isActive: 'test',
-            };
-
-            const testObjectErrors = schema.validate(testObject);
-            const testObject2Errors = schema.validate(testObject2);
-            expect(Object.keys(testObjectErrors).length).toBe(0);
-            expect(Object.keys(testObject2Errors).length).toBe(1);
-        });
-
-        it('should validate Object', () => {
-            const schema = new Schema({
-                data: {
-                    type: Object,
-                },
-            });
-
-            const testObject = {
-                data: {
-                    title: 'title description',
-                    description: 'test description',
-                },
-            };
-
-            const testObject2 = {
-                data: 'test',
-            };
-
-            const testObject3 = {
-                data: null,
-            };
-
-            const testObjectErrors = schema.validate(testObject);
-            const testObject2Errors = schema.validate(testObject2);
-            const testObject3Errors = schema.validate(testObject3);
-            expect(Object.keys(testObjectErrors).length).toBe(0);
-            expect(Object.keys(testObject2Errors).length).toBe(1);
-            expect(Object.keys(testObject3Errors).length).toBe(1);
-        });
-
-        it('should validate Date', () => {
-            const schema = new Schema({
-                createdAt: {
-                    type: Date,
-                },
-            });
-
-            const testObject = {
-                createdAt: new Date(),
-            };
-
-            const testObject2 = {
-                createdAt: '2017-01-01',
-            };
-
-            const testObjectErrors = schema.validate(testObject);
-            const testObject2Errors = schema.validate(testObject2);
-            expect(Object.keys(testObjectErrors).length).toBe(0);
-            expect(Object.keys(testObject2Errors).length).toBe(1);
-        });
-
-        it('should validate Array', () => {
-            const schema = new Schema({
-                names: {
-                    type: Array,
-                },
-            });
-
-            const testObject = {
-                names: ['Mike', 'Nicolas'],
-            };
-
-            const testObject2 = {
-                names: 'Mike,Nicolas',
-            };
-
-            const testObjectErrors = schema.validate(testObject);
-            const testObject2Errors = schema.validate(testObject2);
-            expect(Object.keys(testObjectErrors).length).toBe(0);
-            expect(Object.keys(testObject2Errors).length).toBe(1);
-        });
-
-        it('should validate Schema', () => {
-            const personSchema = new Schema({
-                name: {
-                    type: String,
-                },
-                age: {
-                    type: Number,
-                },
-            });
-
-            const schema = new Schema({
-                owner: {
-                    type: personSchema,
-                },
-            });
-
-            const testObject = {
-                owner: {
-                    name: 'Mike',
-                    age: 20,
-                },
-            };
-
-            const testObject2 = {
-                owner: {
-                    name: 123,
-                    age: 'test',
-                },
-            };
-
-            const testObjectErrors = schema.validate(testObject);
-            const testObject2Errors = schema.validate(testObject2);
-            expect(Object.keys(testObjectErrors).length).toBe(0);
-            expect(Object.keys(testObject2Errors).length).toBe(1);
-        });
-
-        it('should validate OneOfTypes', () => {
-            const personSchema = new Schema({
-                name: {
-                    type: Schema.oneOfTypes([String, Number]),
-                },
-                age: {
-                    type: Number,
-                },
-            });
-
-            const schema = new Schema({
-                owner: {
-                    type: personSchema,
-                },
-            });
-
-            const testObject = {
-                owner: {
-                    name: 'Mike',
-                    age: 20,
-                },
-            };
-
-            const testObject2 = {
-                owner: {
-                    name: 123,
-                    age: 22,
-                },
-            };
-
-            const testObject3 = {
-                owner: {
-                    name: {
-                        first: 'Mike',
+    describe('Type validation', () => {
+        describe('String', () => {
+            let schema;
+            beforeEach(() => {
+                schema = new Schema({
+                    companyName: {
+                        type: String,
                     },
-                    age: 'test',
-                },
-            };
+                });
+            });
+            it('should return empty errors list when given model is valid', () => {
+                const model = {
+                    companyName: 'Test Company',
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(0);
+            });
+            it('should return errors list when given model is not valid', () => {
+                const model = {
+                    companyName: 2345,
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(1);
+            });
+        });
 
-            const testObjectErrors = schema.validate(testObject);
-            const testObject2Errors = schema.validate(testObject2);
-            const testObject3Errors = schema.validate(testObject3);
-            expect(Object.keys(testObjectErrors).length).toBe(0);
-            expect(Object.keys(testObject2Errors).length).toBe(0);
-            expect(Object.keys(testObject3Errors).length).toBe(1);
+        describe('Number', () => {
+            let schema;
+            beforeEach(() => {
+                schema = new Schema({
+                    companyNumber: {
+                        type: Number,
+                    },
+                });
+            });
+            it('should return empty errors list when given model is valid', () => {
+                const model = {
+                    companyNumber: 2345,
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(0);
+            });
+            it('should return errors list when given model is not valid', () => {
+                const model = {
+                    companyNumber: 'Test Company',
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(1);
+            });
+        });
+
+        describe('Boolean', () => {
+            let schema;
+            beforeEach(() => {
+                schema = new Schema({
+                    isActive: {
+                        type: Boolean,
+                    },
+                });
+            });
+            it('should return empty errors list when given model is valid', () => {
+                const model = {
+                    isActive: true,
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(0);
+            });
+
+            it('should return errors list when given model is not valid', () => {
+                const model = {
+                    isActive: 'not boolean',
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(1);
+            });
+        });
+
+        describe('Object', () => {
+            let schema;
+            beforeEach(() => {
+                schema = new Schema({
+                    data: {
+                        type: Object,
+                    },
+                });
+            });
+            it('should return empty errors list when given model is valid', () => {
+                const model = {
+                    data: {
+                        title: 'title',
+                        description: 'description',
+                    },
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(0);
+            });
+
+            it('should return errors list when given model does have a String type instead of Object', () => {
+                const model = {
+                    data: 'test',
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(1);
+            });
+
+            it('should return errors list when given model does have a Null type instead of Object', () => {
+                const model = {
+                    data: null,
+                };
+
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(1);
+            });
+        });
+
+        describe('Date', () => {
+            let schema;
+            beforeEach(() => {
+                schema = new Schema({
+                    createdAt: {
+                        type: Date,
+                    },
+                });
+            });
+            it('should return empty errors list when given model is valid', () => {
+                const model = {
+                    createdAt: new Date(),
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(0);
+            });
+
+            it('should return errors list when given model is not valid', () => {
+                const model = {
+                    createdAt: '2017-01-01',
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(1);
+            });
+        });
+
+        describe('Array', () => {
+            let schema;
+            beforeEach(() => {
+                schema = new Schema({
+                    names: {
+                        type: Array,
+                    },
+                });
+            });
+            it('should return empty errors list when given model is valid', () => {
+                const model = {
+                    names: ['Mike', 'Nicolas'],
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(0);
+            });
+
+            it('should return errors list when given model is not valid', () => {
+                const model = {
+                    names: 'Mike,Nicolas',
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(1);
+            });
+        });
+
+        describe('Schema', () => {
+            let schema;
+            let personSchema;
+            beforeEach(() => {
+                personSchema = new Schema({
+                    name: {
+                        type: String,
+                    },
+                });
+
+                schema = new Schema({
+                    owner: {
+                        type: personSchema,
+                    },
+                });
+            });
+            it('should return empty errors list when given model is valid', () => {
+                const model = {
+                    owner: {
+                        name: 'Mike',
+                    },
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(0);
+            });
+
+            it('should return errors list when given model is not valid', () => {
+                const model = {
+                    owner: {
+                        name: 123,
+                    },
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(1);
+            });
+        });
+
+        describe('OneOfTypes', () => {
+            let schema;
+            let personSchema;
+            beforeEach(() => {
+                personSchema = new Schema({
+                    name: {
+                        type: Schema.oneOfTypes([String, Number]),
+                    },
+                });
+                schema = new Schema({
+                    owner: {
+                        type: personSchema,
+                    },
+                });
+            });
+            it('should return empty errors list when given model has a property of String type', () => {
+                const model = {
+                    owner: {
+                        name: 'Mike',
+                    },
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(0);
+            });
+
+            it('should return empty errors list when given model has a property of Number type', () => {
+                const model = {
+                    owner: {
+                        name: 123,
+                    },
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(0);
+            });
+            it('should return errors list when given model is not valid', () => {
+                const model = {
+                    owner: {
+                        name: true,
+                    },
+                };
+                const errorsList = schema.validate(model);
+                expect(size(errorsList)).toBe(1);
+            });
         });
 
         it('should validate optionalType', () => {
