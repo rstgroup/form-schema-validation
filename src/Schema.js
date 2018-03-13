@@ -70,7 +70,6 @@ export default class Schema {
     constructor(schema, messages, validateKeys = true) {
         this.schema = schema;
         this.errors = {};
-        this.promises = [];
         this.additionalValidators = new Set();
         this.messages = { ...defaultErrorMessages, ...messages };
         this.validateKeys = validateKeys;
@@ -148,15 +147,14 @@ export default class Schema {
 
     validate(model) {
         this.errors = {};
-        this.promises = [];
         if (model) {
             this.handleModelKeysNotDefinedInSchema(model);
-            this.checkTypesAndValidators(model);
+            const promises = this.checkTypesAndValidators(model);
+            if (promises.length > 0) {
+                return Promise.all(promises).then(() => this.errors);
+            }
         } else {
             this.setMissingModelError();
-        }
-        if (this.promises.length > 0) {
-            return Promise.all(this.promises).then(() => this.errors);
         }
         return this.errors;
     }
@@ -205,6 +203,7 @@ export default class Schema {
     }
 
     checkTypesAndValidators(model) {
+        let promises = [];
         const schemaKeys = Object.keys(this.schema);
         const validatedObject = pick(model, schemaKeys);
         schemaKeys.forEach((key) => {
@@ -220,15 +219,15 @@ export default class Schema {
                 this.validateType(fieldType, value, key);
             }
             this.validateRequired(fieldSchema, value, key);
-            this.validateCustomValidators({
+            promises = promises.concat(this.validateCustomValidators({
                 validators: fieldSchema.validators,
                 value,
                 fieldSchema,
                 validatedObject,
                 key,
-            });
+            }));
         });
-        this.validateAdditionalValidators(model);
+        return promises.concat(this.validateAdditionalValidators(model));
     }
 
     resolveValidatorErrorsForKey(key, errorMessage, results) {
@@ -248,29 +247,32 @@ export default class Schema {
     }
 
     validateCustomValidators({ validators, value, fieldSchema, validatedObject, key }) {
-        if (!validators) {
-            return;
+        const promises = [];
+        if (Array.isArray(validators)) {
+            validators.forEach(({ validator, errorMessage }) => {
+                const results = validator(value, fieldSchema, validatedObject);
+                if (isPromise(results)) {
+                    const promise = results.then((result) => {
+                        this.resolveValidatorErrorsForKey(key, errorMessage, result);
+                    });
+                    promises.push(promise);
+                    return;
+                }
+                this.resolveValidatorErrorsForKey(key, errorMessage, results);
+            });
         }
-        validators.forEach(({ validator, errorMessage }) => {
-            const results = validator(value, fieldSchema, validatedObject);
-            if (isPromise(results)) {
-                const promise = results.then((result) => {
-                    this.resolveValidatorErrorsForKey(key, errorMessage, result);
-                });
-                this.promises.push(promise);
-                return;
-            }
-            this.resolveValidatorErrorsForKey(key, errorMessage, results);
-        });
+        return promises;
     }
 
     validateAdditionalValidators(model) {
+        const promises = [];
         this.additionalValidators.forEach((validator) => {
             const results = validator(model, this);
             if (isPromise(results)) {
-                this.promises.push(results);
+                promises.push(results);
             }
         });
+        return promises;
     }
 
     validateRequired(fieldSchema, value, key) {
