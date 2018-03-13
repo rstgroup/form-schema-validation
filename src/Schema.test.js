@@ -1,6 +1,6 @@
 import size from 'lodash/size';
 
-import Schema from './Schema';
+import Schema, { operators } from './Schema';
 import SchemaType from './SchemaType';
 
 describe('Schema', () => {
@@ -214,7 +214,7 @@ describe('Schema', () => {
             beforeEach(() => {
                 personSchema = new Schema({
                     name: {
-                        type: Schema.oneOfTypes([String, Number]),
+                        type: operators.or([String, Number]),
                     },
                 });
                 schema = new Schema({
@@ -519,7 +519,7 @@ describe('Schema', () => {
         it('should validate array of OneOfTypes', () => {
             const personSchema = new Schema({
                 name: {
-                    type: Schema.oneOfTypes([String, Number]),
+                    type: operators.or([String, Number]),
                 },
                 age: {
                     type: Number,
