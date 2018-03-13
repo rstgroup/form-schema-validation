@@ -134,7 +134,7 @@ results.then((errors) => {
 | Date | This type check value is instance of Date |
 | Array | This type check value is array of any value |
 | new Schema | This type check value is instance of Schema and validate value by this schema |
-| Schema.oneOfType([type1, type2, ...]) | This type give you posibility check one of types it will return error if value don't match all types |
+| Schema.operators.or([type1, type2, ...]) | This type give you posibility check one of types it will return error if value don't match all types |
 | Schema.optionalType(type) | This type will pass validation if value is null or undefined when field is not required |
 | SchemaType | You can register new schema type that has name, validator, validator when field is required (requiredValidator) and getDefaultValue |
 | [OneOfTypesAbove] | This type check value is array of type |
@@ -207,7 +207,7 @@ const validateIfOfAge = () => ({
 If You want create new schema You must put object to constructor with information about object keys names and type of value on key.
 
 ```js
-import Schema from 'form-schema-validation';
+import Schema, { operators } from 'form-schema-validation';
 
 const min = (minLength, message) => ({
     validator: (value) => {
@@ -224,7 +224,7 @@ const schema = new Schema({
         validators: [min(2, 'Company name should be longer then 2 chars')]
     },
     createdAt: {
-        type: Schema.oneOfTypes([Date, String]),
+        type: operators.or([Date, String]),
         defaultValue: new Date(),
         label: 'When start'
     },

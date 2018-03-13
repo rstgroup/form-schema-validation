@@ -18,7 +18,7 @@ import validateNumber from './validators/number';
 import validateObject from './validators/object';
 import validateString from './validators/string';
 
-import OneOfTypes from './operators/OneOfTypes';
+import OrOperator from './operators/OrOperator';
 import SchemaType from './SchemaType';
 
 const defaultMessages = {
@@ -44,11 +44,19 @@ const handleTypeValidation = (validatorName, schema, value, key, index) => {
         schema.setError(key, schema.messages.validateString(label || key), index);
     }
     return result;
-}
+};
 
-class Schema {
+export const operators = {
+    or(types) {
+        return new OrOperator(types);
+    },
+};
+
+export default class Schema {
     static oneOfTypes(types) {
-        return new OneOfTypes(types);
+        // eslint-disable-next-line no-console
+        console.warn('[Deprecated] Pleas use `Schema.operators.or` instead');
+        return operators.or(types);
     }
     static optionalType(type, uniqueTypeName = '') {
         const fieldType = getFieldType({ type });
@@ -367,8 +375,8 @@ class Schema {
         if (type instanceof Schema) {
             return this.validateTypeSchema(value, key, type, index);
         }
-        if (type instanceof OneOfTypes) {
-            return this.validateOneOfTypes(value, key, type, index);
+        if (type instanceof OrOperator) {
+            return this.validateOrOperator(value, key, type, index);
         }
         throw new Error(`Unrecognized type ${typeName}`);
     }
@@ -417,7 +425,7 @@ class Schema {
         return false;
     }
 
-    validateOneOfTypes(value, key, type, index) {
+    validateOrOperator(value, key, type, index) {
         const schema = new Schema(type.getSchema());
         const errors = schema.validate(type.parseValue(value));
         const keys = Object.keys(errors);
@@ -476,4 +484,4 @@ class Schema {
     }
 }
 
-export default Schema;
+Schema.operators = operators;

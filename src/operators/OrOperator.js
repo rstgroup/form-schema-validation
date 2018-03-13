@@ -1,4 +1,4 @@
-class OneOfTypes {
+class OrOperator {
     constructor(types) {
         this.types = types;
     }
@@ -24,4 +24,4 @@ class OneOfTypes {
     }
 }
 
-export default OneOfTypes;
+export default OrOperator;
