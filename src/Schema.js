@@ -22,19 +22,6 @@ import OrOperator from './operators/OrOperator';
 import SchemaType from './SchemaType';
 import * as defaultErrorMessages from './defaultErrorMessages';
 
-const handleTypeValidation = (validatorName, schema, value, key, index) => {
-    const validate = schema.validators[validatorName];
-    if (typeof validate !== 'function') {
-        throw new Error(`Uknown "${validatorName}" validator`);
-    }
-    const result = validate(value);
-    if (!result) {
-        const { label } = schema.getField(key);
-        schema.setError(key, schema.messages.validateString(label || key), index);
-    }
-    return result;
-};
-
 export const operators = {
     or(types) {
         return new OrOperator(types);
@@ -74,21 +61,6 @@ export default class Schema {
         this.messages = { ...defaultErrorMessages, ...messages };
         this.validateKeys = validateKeys;
 
-        this.validators = {
-            validateArray,
-            validateBoolean,
-            validateDate,
-            validateNumber,
-            validateObject,
-            validateString,
-        };
-
-        this.validateTypeString = this.validateTypeString.bind(this);
-        this.validateTypeNumber = this.validateTypeNumber.bind(this);
-        this.validateTypeObject = this.validateTypeObject.bind(this);
-        this.validateTypeArray = this.validateTypeArray.bind(this);
-        this.validateTypeBoolean = this.validateTypeBoolean.bind(this);
-        this.validateTypeDate = this.validateTypeDate.bind(this);
         this.validateTypeSchema = this.validateTypeSchema.bind(this);
         this.validateRequiredType = this.validateRequiredType.bind(this);
         this.validateRequiredTypeObject = this.validateRequiredTypeObject.bind(this);
@@ -97,12 +69,12 @@ export default class Schema {
         this.validateRequiredTypeArray = this.validateRequiredTypeArray.bind(this);
 
         this.typesValidators = {
-            String: this.validateTypeString,
-            Number: this.validateTypeNumber,
-            Object: this.validateTypeObject,
-            Array: this.validateTypeArray,
-            Boolean: this.validateTypeBoolean,
-            Date: this.validateTypeDate,
+            Array: this.handleTypeValidation.bind(this, validateArray),
+            Boolean: this.handleTypeValidation.bind(this, validateBoolean),
+            Date: this.handleTypeValidation.bind(this, validateDate),
+            Number: this.handleTypeValidation.bind(this, validateNumber),
+            Object: this.handleTypeValidation.bind(this, validateObject),
+            String: this.handleTypeValidation.bind(this, validateString),
         };
 
         this.typesRequiredValidators = {
@@ -361,40 +333,16 @@ export default class Schema {
         throw new Error(`Unrecognized type ${typeName}`);
     }
 
-    validateTypeString(value, key, index) {
-        const schema = this;
-        const validatorName = 'validateString';
-        return handleTypeValidation(validatorName, schema, value, key, index);
-    }
-
-    validateTypeNumber(value, key, index) {
-        const schema = this;
-        const validatorName = 'validateNumber';
-        return handleTypeValidation(validatorName, schema, value, key, index);
-    }
-
-    validateTypeObject(value, key, index) {
-        const schema = this;
-        const validatorName = 'validateObject';
-        return handleTypeValidation(validatorName, schema, value, key, index);
-    }
-
-    validateTypeArray(value, key, index) {
-        const schema = this;
-        const validatorName = 'validateArray';
-        return handleTypeValidation(validatorName, schema, value, key, index);
-    }
-
-    validateTypeBoolean(value, key, index) {
-        const schema = this;
-        const validatorName = 'validateBoolean';
-        return handleTypeValidation(validatorName, schema, value, key, index);
-    }
-
-    validateTypeDate(value, key, index) {
-        const schema = this;
-        const validatorName = 'validateDate';
-        return handleTypeValidation(validatorName, schema, value, key, index);
+    handleTypeValidation(validate, value, key, index) {
+        if (typeof validate !== 'function') {
+            throw new Error('Uknown validator');
+        }
+        const result = validate(value);
+        if (!result) {
+            const { label } = this.getField(key);
+            this.setError(key, this.messages.validateString(label || key), index);
+        }
+        return result;
     }
 
     validateTypeSchema(value, subSchemaKey, type, index) {
