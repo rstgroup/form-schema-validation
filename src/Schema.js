@@ -2,8 +2,7 @@ import {
     pick,
     arraysDifference,
     getFieldType,
-    getDefaultValueForType,
-    getDefaultValueFromOptions,
+    getFieldDefaultValue,
     wrapToArray,
     getFunctionName,
     removeFirstKeyIfNumber,
@@ -130,35 +129,24 @@ export default class Schema {
 
     getDefaultValues() {
         const fieldsKeys = Object.keys(this.schema);
-        const model = {};
+        const defaultValues = {};
+
         fieldsKeys.forEach((key) => {
             const field = this.getField(key);
-            const isArrayOfType = Array.isArray(field.type);
             const fieldType = getFieldType(field);
-            if (field.disableDefaultValue) {
-                return;
+            let defaultValue;
+            if (!field.disableDefaultValue) {
+                const isTypeAnArray = Array.isArray(field.type);
+                if (fieldType instanceof Schema) {
+                    defaultValue = fieldType.getDefaultValues();
+                } else {
+                    defaultValue = getFieldDefaultValue(field);
+                }
+                defaultValues[key] = isTypeAnArray ? wrapToArray(defaultValue) : defaultValue;
             }
-            if (field.defaultValue !== undefined) {
-                model[key] = wrapToArray(field.defaultValue, isArrayOfType);
-                return;
-            }
-            if (field.options) {
-                model[key] = wrapToArray(
-                    getDefaultValueFromOptions(field.options),
-                    isArrayOfType,
-                );
-                return;
-            }
-            if (fieldType instanceof Schema) {
-                model[key] = wrapToArray(
-                    fieldType.getDefaultValues(),
-                    isArrayOfType,
-                );
-                return;
-            }
-            model[key] = getDefaultValueForType(fieldType, isArrayOfType);
         });
-        return model;
+
+        return defaultValues;
     }
 
     getField(name) {

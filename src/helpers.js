@@ -14,9 +14,11 @@ export const arraysDifference = (keys, compareKeys) => {
     return differenceBetweanObjects;
 };
 
-export const wrapToArray = (value, shouldWrapToArray) => {
-    if (shouldWrapToArray && !Array.isArray(value)) return [value];
-    return value;
+export const wrapToArray = (value) => {
+    if (Array.isArray(value)) {
+        return value;
+    }
+    return [value];
 };
 
 export const getFieldType = (field) => {
@@ -26,17 +28,29 @@ export const getFieldType = (field) => {
     return field.type;
 };
 
-export const getDefaultValueForType = (type, isArrayOfType) => {
+export const getFieldDefaultValue = (field) => {
+    const fieldType = getFieldType(field);
+
+    if (field.defaultValue !== undefined) {
+        return field.defaultValue;
+    } else if (field.options) {
+        return getDefaultValueFromOptions(field.options);
+    }
+
+    return getDefaultValueForType(fieldType);
+};
+
+export const getDefaultValueForType = (type) => {
     if (typeof type.getDefaultValue === 'function') {
-        return wrapToArray(type.getDefaultValue(), isArrayOfType);
+        return type.getDefaultValue();
     }
     if (type === Number) {
-        return wrapToArray(NaN, isArrayOfType);
+        return NaN;
     }
     if (type === Date) {
-        return wrapToArray(new Date(), isArrayOfType);
+        return new Date();
     }
-    return wrapToArray(type(), isArrayOfType);
+    return type();
 };
 
 export const getDefaultValueFromOptions = (options) => {
@@ -93,7 +107,7 @@ export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
     errorKeys.forEach((key) => {
         const current = currentErrors[key] || [];
         const next = nextErrors[key] || [];
-        errors[key] = [...wrapToArray(current, true), ...wrapToArray(next, true)];
+        errors[key] = [...wrapToArray(current), ...wrapToArray(next)];
     });
     return errors;
 };

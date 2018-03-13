@@ -52,11 +52,11 @@ describe('helpers', () => {
     describe('wrapToArray', () => {
         it('should wrap value to array', () => {
             const foo = 'fooValue';
-            expect(wrapToArray(foo, true)).toEqual(['fooValue']);
+            expect(wrapToArray(foo)).toEqual(['fooValue']);
         });
-        it('should not wrap value to array', () => {
-            const foo = 'fooValue';
-            expect(wrapToArray(foo)).toEqual('fooValue');
+        it('should not wrap value to array if it is already an array', () => {
+            const foo = ['fooValue'];
+            expect(wrapToArray(foo)).toEqual(['fooValue']);
         });
     });
     describe('getDefaultValueForType', () => {
@@ -64,45 +64,21 @@ describe('helpers', () => {
             const type = Number;
             expect(Number.isNaN(getDefaultValueForType(type))).toEqual(true);
         });
-        it('should get default value for type array of Numbers', () => {
-            const type = Number;
-            expect(Number.isNaN(getDefaultValueForType(type, true)[0])).toEqual(true);
-        });
-
         it('should get default value for type String', () => {
             const type = String;
             expect(getDefaultValueForType(type)).toEqual('');
         });
-        it('should get default value for type array of Strings', () => {
-            const type = String;
-            expect(getDefaultValueForType(type, true)).toEqual(['']);
-        });
-
         it('should get default value for type Boolean', () => {
             const type = Boolean;
             expect(getDefaultValueForType(type)).toEqual(false);
         });
-        it('should get default value for type array of Boolean', () => {
-            const type = Boolean;
-            expect(getDefaultValueForType(type, true)).toEqual([false]);
-        });
-
         it('should get default value for custom type', () => {
             const type = { getDefaultValue: () => 'bar' };
             expect(getDefaultValueForType(type)).toEqual('bar');
         });
-        it('should get default value for type array of custom type', () => {
-            const type = { getDefaultValue: () => 'bar' };
-            expect(getDefaultValueForType(type, true)).toEqual(['bar']);
-        });
-
         it('should get default value for type Date', () => {
             const type = Date;
             expect(getDefaultValueForType(type) instanceof Date).toEqual(true);
-        });
-        it('should get default value for type array of Date', () => {
-            const type = Date;
-            expect(getDefaultValueForType(type, true)[0] instanceof Date).toEqual(true);
         });
     });
     describe('getDefaultValueFromOptions', () => {
