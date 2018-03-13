@@ -97,3 +97,5 @@ export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
     });
     return errors;
 };
+
+export const isPromise = object => typeof object === 'object' && typeof object.then === 'function' && typeof object.catch === 'function';

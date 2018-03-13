@@ -9,6 +9,7 @@ import {
     removeFirstKeyIfNumber,
     getErrorIndexFromKeys,
     mergeErrors,
+    isPromise,
 } from './helpers';
 
 import validateArray from './validators/array';
@@ -275,7 +276,7 @@ export default class Schema {
         }
         validators.forEach(({ validator, errorMessage }) => {
             const results = validator(value, fieldSchema, validatedObject);
-            if (results instanceof Promise) {
+            if (isPromise(results)) {
                 const promise = results.then((result) => {
                     this.resolveValidatorErrorsForKey(key, errorMessage, result);
                 });
@@ -289,7 +290,7 @@ export default class Schema {
     validateAdditionalValidators(model) {
         this.additionalValidators.forEach((validator) => {
             const results = validator(model, this);
-            if (results instanceof Promise) {
+            if (isPromise(results)) {
                 this.promises.push(results);
             }
         });

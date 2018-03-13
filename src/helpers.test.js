@@ -10,6 +10,7 @@ import {
     removeFirstKeyIfNumber,
     getErrorIndexFromKeys,
     mergeErrors,
+    isPromise,
 } from './helpers';
 
 describe('helpers', () => {
@@ -259,6 +260,23 @@ describe('helpers', () => {
             const currentErrors = undefined;
             const nextErrors = 'bar error';
             expect(mergeErrors(currentErrors, nextErrors)).toEqual(['bar error']);
+        });
+    });
+    describe('isPromise', () => {
+        it('returns true if given object has a `then` and `catch` method', () => {
+            const object = {
+                then: () => {},
+                catch: () => {},
+            };
+            const results = isPromise(object);
+            const expectedResults = true;
+            expect(results).toBe(expectedResults);
+        });
+        it('returns false if given object does not have `catch` nor `then` method', () => {
+            const object = {};
+            const results = isPromise(object);
+            const expectedResults = false;
+            expect(results).toBe(expectedResults);
         });
     });
 });
