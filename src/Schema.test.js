@@ -806,90 +806,106 @@ describe('Schema', () => {
             expect(Object.keys(testObject2Errors).length).toBe(1);
         });
 
-        it('should validate optionalType', () => {
-            const subSchema = new Schema({
-                name: {
-                    type: Schema.optionalType(String),
-                },
+        describe('should validate optionalType', () => {
+            let subSchema;
+            let schema;
+            beforeEach(() => {
+                subSchema = new Schema({
+                    name: {
+                        type: Schema.optionalType(String),
+                    },
+                });
+                schema = new Schema({
+                    name: {
+                        type: Schema.optionalType(String),
+                        required: true,
+                    },
+                    age: {
+                        type: Schema.optionalType(Number),
+                        required: true,
+                    },
+                    date: {
+                        type: Schema.optionalType(Date),
+                        required: true,
+                    },
+                    object: {
+                        type: Schema.optionalType(Object),
+                        required: true,
+                    },
+                    isTrue: {
+                        type: Schema.optionalType(Boolean),
+                        required: true,
+                    },
+                    array: {
+                        type: Schema.optionalType(Array),
+                        required: true,
+                    },
+                    schemaObject: {
+                        type: Schema.optionalType(subSchema),
+                        required: true,
+                    },
+                });
             });
-            const schema = new Schema({
-                name: {
-                    type: Schema.optionalType(String),
-                    required: true,
-                },
-                age: {
-                    type: Schema.optionalType(Number),
-                    required: true,
-                },
-                date: {
-                    type: Schema.optionalType(Date),
-                    required: true,
-                },
-                object: {
-                    type: Schema.optionalType(Object),
-                    required: true,
-                },
-                isTrue: {
-                    type: Schema.optionalType(Boolean),
-                    required: true,
-                },
-                array: {
-                    type: Schema.optionalType(Array),
-                    required: true,
-                },
-                schemaObject: {
-                    type: Schema.optionalType(subSchema),
-                    required: true,
-                },
-            });
-            const modelWithFilledCorrectTypes = {
-                name: 'foo',
-                age: 123,
-                date: new Date(),
-                object: { foo: 'bar' },
-                isTrue: true,
-                array: ['foo'],
-                schemaObject: { name: '' },
-            };
-            const modelWithEmptyCorrectTypes = {
-                name: '',
-                age: NaN,
-                date: new Date(),
-                object: {},
-                isTrue: false,
-                array: [],
-                schemaObject: {},
-            };
-            const modelWithNull = {
-                name: null,
-                age: null,
-                date: null,
-                object: null,
-                isTrue: null,
-                array: null,
-                schemaObject: null,
-            };
-            const modelWithUndefined = {};
-            const modelWithNumber = {
-                name: 0,
-                age: 'foo',
-                date: 'foo',
-                object: 'foo',
-                isTrue: 'foo',
-                array: 0,
-                schemaObject: 'foo',
-            };
 
-            const modelWithFilledCorrectTypesErrors = schema.validate(modelWithFilledCorrectTypes);
-            const modelWithEmptyCorrectTypesErrors = schema.validate(modelWithEmptyCorrectTypes);
-            const modelWithNullErrors = schema.validate(modelWithNull);
-            const modelWithUndefinedErrors = schema.validate(modelWithUndefined);
-            const modelWithNumberErrors = schema.validate(modelWithNumber);
-            expect(Object.keys(modelWithFilledCorrectTypesErrors).length).toBe(0);
-            expect(Object.keys(modelWithEmptyCorrectTypesErrors).length).toBe(6);
-            expect(Object.keys(modelWithNullErrors).length).toBe(7);
-            expect(Object.keys(modelWithUndefinedErrors).length).toBe(7);
-            expect(Object.keys(modelWithNumberErrors).length).toBe(7);
+            it('where model has empty correct types', () => {
+                const modelWithEmptyCorrectTypes = {
+                    name: '',
+                    age: NaN,
+                    date: new Date(),
+                    object: {},
+                    isTrue: false,
+                    array: [],
+                    schemaObject: {},
+                };
+                const modelWithEmptyCorrectTypesErrors = schema.validate(modelWithEmptyCorrectTypes);
+                expect(Object.keys(modelWithEmptyCorrectTypesErrors).length).toBe(6);
+            });
+            it('where model has non empty correct types', () => {
+                const modelWithFilledCorrectTypes = {
+                    name: 'foo',
+                    age: 123,
+                    date: new Date(),
+                    object: { foo: 'bar' },
+                    isTrue: true,
+                    array: ['foo'],
+                    schemaObject: { name: '' },
+                };
+                const modelWithFilledCorrectTypesErrors = schema.validate(modelWithFilledCorrectTypes);
+                expect(Object.keys(modelWithFilledCorrectTypesErrors).length).toBe(0);
+            });
+            it('where medel has all properties set to null', () => {
+                const modelWithNull = {
+                    name: null,
+                    age: null,
+                    date: null,
+                    object: null,
+                    isTrue: null,
+                    array: null,
+                    schemaObject: null,
+                };
+                const modelWithNullErrors = schema.validate(modelWithNull);
+                expect(Object.keys(modelWithNullErrors).length).toBe(7);
+            });
+
+            it('where model has all properties set to undefiend', () => {
+                const modelWithUndefined = {};
+                const modelWithUndefinedErrors = schema.validate(modelWithUndefined);
+                expect(Object.keys(modelWithUndefinedErrors).length).toBe(7);
+            });
+
+            it('where model has all propertes set to number or string', () => {
+                const modelWithNumber = {
+                    name: 0,
+                    age: 'foo',
+                    date: 'foo',
+                    object: 'foo',
+                    isTrue: 'foo',
+                    array: 0,
+                    schemaObject: 'foo',
+                };
+                const modelWithNumberErrors = schema.validate(modelWithNumber);
+                expect(Object.keys(modelWithNumberErrors).length).toBe(7);
+            });
         });
     });
     describe('Should validate using custom validators', () => {
@@ -1436,21 +1452,6 @@ describe('Schema', () => {
                     return false;
                 },
             });
-        });
-
-        it('should register new schema type', () => {
-            const schema = new Schema({
-                foo: {
-                    type: fooType,
-                },
-                bar: {
-                    type: String,
-                },
-            });
-
-            schema.registerType(fooType);
-            expect(typeof schema.typesValidators.Foo).toBe('function');
-            expect(typeof schema.typesRequiredValidators.Foo).toBe('function');
         });
 
         it('should validate new schema type', () => {

@@ -1,2 +1,2 @@
-const validateRequiredBoolean = value => value;
+const validateRequiredBoolean = value => !!(value);
 export default validateRequiredBoolean;

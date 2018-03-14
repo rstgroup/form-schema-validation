@@ -1,5 +1,6 @@
 import {
     pick,
+    clone,
     arraysDifference,
     getFieldType,
     getFieldDefaultValue,
@@ -10,20 +11,6 @@ import {
     mergeErrors,
     isPromise,
 } from './helpers';
-
-import validateArray from './validators/array';
-import validateBoolean from './validators/boolean';
-import validateDate from './validators/date';
-import validateNumber from './validators/number';
-import validateObject from './validators/object';
-import validateString from './validators/string';
-import validateRequired from './validators/required';
-import validateRequiredObject from './validators/requiredObject';
-import validateRequiredArray from './validators/requiredArray';
-import validateRequiredNumber from './validators/requiredNumber';
-import validateRequiredDate from './validators/requiredDate';
-import validateRequiredString from './validators/requiredString';
-import validateRequiredBoolean from './validators/requiredBoolean';
 
 import OrOperator from './operators/OrOperator';
 import SchemaType from './SchemaType';
@@ -63,34 +50,14 @@ export default class Schema {
         });
     }
 
+
     constructor(schema, messages, validateKeys = true) {
         this.schema = schema;
         this.errors = {};
         this.additionalValidators = new Set();
         this.messages = { ...defaultErrorMessages, ...messages };
         this.validateKeys = validateKeys;
-        this.fields = Field.createFieldsFromRawSchema(schema);
-        this.validateTypeSchema = this.validateTypeSchema.bind(this);
-
-        const handler = this.handleTypeValidation;
-
-        this.typesValidators = {
-            Array: handler.bind(this, validateArray, this.messages.validateArray),
-            Boolean: handler.bind(this, validateBoolean, this.messages.validateBoolean),
-            Date: handler.bind(this, validateDate, this.messages.validateDate),
-            Number: handler.bind(this, validateNumber, this.messages.validateNumber),
-            Object: handler.bind(this, validateObject, this.messages.validateObject),
-            String: handler.bind(this, validateString, this.messages.validateString),
-        };
-
-        this.typesRequiredValidators = {
-            Array: handler.bind(this, validateRequiredArray, this.messages.validateRequired),
-            Boolean: handler.bind(this, validateRequiredBoolean, this.messages.validateRequired),
-            Date: handler.bind(this, validateRequiredDate, this.messages.validateRequired),
-            Number: handler.bind(this, validateRequiredNumber, this.messages.validateRequired),
-            Object: handler.bind(this, validateRequiredObject, this.messages.validateRequired),
-            String: handler.bind(this, validateRequiredString, this.messages.validateRequired),
-        };
+        this.fields = Field.createFieldsFromRawSchema(schema, messages);
     }
 
     getDefaultValues() {
@@ -172,7 +139,7 @@ export default class Schema {
             return;
         }
         const modelKeys = Object.keys(model);
-        const schemaKeys = Object.keys(this.schema);
+        const schemaKeys = this.fields.map(field => field.key);
         const keysDiff = arraysDifference(modelKeys, schemaKeys);
         keysDiff.forEach((key) => {
             const errorMessage = this.messages.notDefinedKey(key);
@@ -184,26 +151,11 @@ export default class Schema {
         let promises = [];
         const schemaKeys = Object.keys(this.schema);
         const validatedObject = pick(model, schemaKeys);
-        schemaKeys.forEach((key) => {
-            const value = validatedObject[key];
-            const fieldSchema = this.schema[key];
-            const isArrayOfType = Array.isArray(fieldSchema.type);
-            const fieldType = isArrayOfType ? fieldSchema.type[0] : fieldSchema.type;
-            if (isArrayOfType && this.validateType(Array, value)) {
-                value.forEach((item, index) => {
-                    this.validateType(fieldType, item, key, index);
-                });
-            } else {
-                this.validateType(fieldType, value, key);
-            }
-            this.validateRequired(fieldSchema, value, key);
-            promises = promises.concat(this.validateCustomValidators({
-                validators: fieldSchema.validators,
-                value,
-                fieldSchema,
-                validatedObject,
-                key,
-            }));
+        this.fields.forEach((field) => {
+            const schema = this;
+            const result = field.validate(validatedObject, schema);
+            this.errors = Object.assign(this.errors, field.errors);
+            promises = promises.concat(result);
         });
         return promises.concat(this.validateAdditionalValidators(model));
     }
@@ -253,84 +205,6 @@ export default class Schema {
         return promises;
     }
 
-    validateRequired(fieldSchema, value, key) {
-        if (!fieldSchema.required) {
-            return;
-        }
-        const { name } = fieldSchema.type;
-        if (typeof this.typesRequiredValidators[name] === 'function') {
-            this.typesRequiredValidators[name](value, key);
-            return;
-        }
-        if (fieldSchema.type instanceof Schema) {
-            this.validateRequiredTypeSchema(fieldSchema.type.schema, value, key);
-            return;
-        }
-        this.handleTypeValidation(validateRequired, this.messages.validateRequired, value, key);
-    }
-
-    validateRequiredTypeSchema(schema, value, key) {
-        if (typeof value === 'object' && value !== null) {
-            let hasRequiredKeys = true;
-            const valueKeys = Object.keys(value);
-            Object.keys(schema).forEach((requiredKey) => {
-                if (valueKeys.indexOf(requiredKey) < 0) {
-                    hasRequiredKeys = false;
-                }
-            });
-            if (hasRequiredKeys) {
-                return;
-            }
-        }
-        const { label } = this.getField(key);
-        this.setError(key, this.messages.validateRequired(label || key));
-    }
-
-    validateType(type, value, key, index) {
-        const typeName = getFunctionName(type);
-        this.registerTypeIfNotExists(type, typeName);
-
-        if (typeof this.typesValidators[typeName] === 'function') {
-            return this.typesValidators[typeName](value, key, type, index);
-        }
-        if (type instanceof Schema) {
-            return this.validateTypeSchema(value, key, type, index);
-        }
-        if (type instanceof OrOperator) {
-            return this.validateOrOperator(value, key, type, index);
-        }
-        throw new Error(`Unrecognized type ${typeName}`);
-    }
-
-    handleTypeValidation(validate, createErrorMessage, value, key, index) {
-        if (typeof validate !== 'function') {
-            throw new Error('Uknown validator');
-        }
-        const result = validate(value);
-        if (!result) {
-            const { label } = this.getField(key);
-            this.setError(key, createErrorMessage(label || key), index);
-        }
-        return result;
-    }
-
-    validateTypeSchema(value, subSchemaKey, type, index) {
-        const errors = type.validate(value);
-        const keys = Object.keys(errors);
-        if (keys.length === 0) return true;
-        this.setError(subSchemaKey, errors, index);
-        return false;
-    }
-
-    validateOrOperator(value, key, type, index) {
-        const schema = new Schema(type.getSchema());
-        const errors = schema.validate(type.parseValue(value));
-        const keys = Object.keys(errors);
-        if (keys.length < type.getTypes().length) return true;
-        this.setError(key, errors, index);
-        return false;
-    }
-
     pick(fieldsToPick) {
         const fields = {};
         fieldsToPick.forEach((fieldName) => {
@@ -356,18 +230,8 @@ export default class Schema {
         });
     }
 
-    registerTypeIfNotExists(type, typeName) {
-        if (type instanceof SchemaType && typeof this.typesValidators[typeName] !== 'function') {
-            this.registerType(type);
-        }
-    }
-
     registerType(type) {
-        const { name, validator, requiredValidator } = type;
-        this.typesValidators[name] = validator.bind(this);
-        if (requiredValidator) {
-            this.typesRequiredValidators[name] = requiredValidator.bind(this);
-        }
+        this.fields.forEach(field => field.registerType(type));
     }
 
     addValidator(validator) {

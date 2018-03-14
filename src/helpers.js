@@ -6,6 +6,8 @@ export const pick = (object, keys) => {
     return pickedObject;
 };
 
+export const clone = object => Object.assign({}, object);
+
 export const includes = (array, value) => array.indexOf(value) < 0;
 
 export const arraysDifference = (array, values) => array.filter(key => includes(values, key));
