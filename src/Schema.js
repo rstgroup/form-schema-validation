@@ -144,11 +144,15 @@ class Schema {
     }
 
     setError(key, error, index) {
-        if (!this.errors[key]) this.errors[key] = [];
+        if (!this.errors[key]) {
+            this.errors[key] = [];
+        }
+
         if (index > -1) {
             this.errors[key][index] = mergeErrors(this.errors[key][index], error);
             return;
         }
+
         this.errors[key].push(error);
     }
 

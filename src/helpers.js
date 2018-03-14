@@ -59,9 +59,8 @@ export const getFunctionName = (type) => {
     return typeName;
 };
 
-/* eslint-disable */
+// eslint-disable-next-line no-self-compare
 export const isNaN = value => typeof value === 'number' && value !== value;
-/* eslint-enable */
 
 export const removeFirstKeyIfNumber = (keys) => {
     const firstKey = parseInt(keys[0], 10);
@@ -79,21 +78,79 @@ export const getErrorIndexFromKeys = (keys) => {
     return -1;
 };
 
-export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
+const isObjectWithoutProps = (obj) => {
+    if (obj === null) {
+        return true;
+    }
+
+    return typeof obj === 'object' &&
+        !Array.isArray(obj) &&
+        Object.keys(obj).length === 0;
+};
+
+const isArrayable = src =>
+    Array.isArray(src) ||
+    typeof src === 'string' ||
+    typeof src === 'undefined';
+
+const castAsArray = (src) => {
+    if (src === null) {
+        return [];
+    }
+    if (Array.isArray(src)) {
+        return src;
+    }
+    if (typeof src === 'string') {
+        return [src];
+    }
+    if (Object.keys(src).length) {
+        return [src];
+    }
+    return [];
+};
+
+const mergeErrorsLists = (a, b) => {
+    const merged = [];
+    const maxLength = Math.max(a.length, b.length);
+
+    for (let i = 0; i < maxLength; i += 1) {
+        const value = b[i] || a[i];
+        if (value && !isObjectWithoutProps(value)) {
+            merged[i] = value;
+        }
+    }
+
+    return merged;
+};
+
+const mergeObjectsErrors = (currentErrors, nextErrors) => {
     const errors = {};
     const errorKeys = new Set();
-    if (typeof nextErrors === 'string') {
-        if (!Array.isArray(currentErrors)) {
-            return [nextErrors];
-        }
-        return [...currentErrors, nextErrors];
+
+    if (!isObjectWithoutProps(currentErrors)) {
+        Object.keys(currentErrors).forEach(key => errorKeys.add(key));
     }
-    Object.keys(currentErrors).forEach(key => errorKeys.add(key));
-    Object.keys(nextErrors).forEach(key => errorKeys.add(key));
+    if (!isObjectWithoutProps(nextErrors)) {
+        Object.keys(nextErrors).forEach(key => errorKeys.add(key));
+    }
+
     errorKeys.forEach((key) => {
         const current = currentErrors[key] || [];
         const next = nextErrors[key] || [];
-        errors[key] = [...wrapToArray(current, true), ...wrapToArray(next, true)];
+        errors[key] = mergeErrors(current, next);
     });
+
     return errors;
+};
+
+export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
+    if (isObjectWithoutProps(currentErrors) && isObjectWithoutProps(nextErrors)) {
+        return {};
+    }
+
+    if (isArrayable(currentErrors) || isArrayable(nextErrors)) {
+        return mergeErrorsLists(castAsArray(currentErrors), castAsArray(nextErrors));
+    }
+
+    return mergeObjectsErrors(currentErrors, nextErrors);
 };
