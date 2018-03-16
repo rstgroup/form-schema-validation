@@ -68,7 +68,6 @@ export default class Field {
             String: handler.bind(this, validateRequiredString, this.messages.validateRequired),
         };
 
-
         Object.keys(validators).map(validatorName =>
             this.addValidator(validatorName, validators[validatorName]));
 
@@ -217,24 +216,12 @@ export default class Field {
         this.validationErrors.clearErrors();
     }
 
-    validate(model, schema) {
+    validate(model) {
         this.clearErrors();
-        const values = this.getValues(model);
-        const firstValue = values[0];
         const fieldType = this.getType();
-
-        values.forEach((value, index) => {
+        this.getValues(model).forEach((value, index) => {
             this.validateType(fieldType, value, this.key, index);
             this.validateRequired(this, value, this.key, index);
-        });
-
-        // @TODO: Needs to be moved to Schema.js
-        return schema.validateCustomValidators({
-            validators: this.validators,
-            value: firstValue,
-            fieldSchema: this,
-            validatedObject: model,
-            key: this.key,
         });
     }
 }

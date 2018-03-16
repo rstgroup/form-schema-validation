@@ -145,21 +145,40 @@ export default class Schema {
         });
     }
 
-    handleEveryFieldValidator(model) {
-        let promises = [];
+    handleSynchronousFieldValidation(model) {
         const schemaKeys = Object.keys(this.schema);
         const validatedObject = pick(model, schemaKeys);
 
         this.fields.forEach((field) => {
-            const schema = this;
-            const result = field.validate(validatedObject, schema);
+            field.validate(validatedObject);
             if (field.hasErrors()) {
-                const errors = field.getErrors();
-                this.errors = Object.assign(this.errors, { [field.key]: errors });
+                this.errors[field.key] = field.getErrors();
             }
+        });
+    }
+
+    handleAsyncFieldValidation(model) {
+        let promises = [];
+
+        this.fields.forEach((field) => {
+            const values = field.getValues(model);
+            const firstValue = values[0];
+            const result = this.validateCustomValidators({
+                validators: field.validators,
+                value: firstValue,
+                fieldSchema: field,
+                validatedObject: model,
+                key: field.key,
+            });
             promises = promises.concat(result);
         });
 
+        return promises;
+    }
+
+    handleEveryFieldValidator(model) {
+        this.handleSynchronousFieldValidation(model);
+        const promises = this.handleAsyncFieldValidation(model);
         return promises.concat(this.validateAdditionalValidators(model));
     }
 
