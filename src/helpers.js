@@ -91,23 +91,4 @@ export const getErrorIndexFromKeys = (keys) => {
     return -1;
 };
 
-export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
-    const errors = {};
-    const errorKeys = new Set();
-    if (typeof nextErrors === 'string') {
-        if (!Array.isArray(currentErrors)) {
-            return [nextErrors];
-        }
-        return [...currentErrors, nextErrors];
-    }
-    Object.keys(currentErrors).forEach(key => errorKeys.add(key));
-    Object.keys(nextErrors).forEach(key => errorKeys.add(key));
-    errorKeys.forEach((key) => {
-        const current = currentErrors[key] || [];
-        const next = nextErrors[key] || [];
-        errors[key] = [...wrapToArray(current), ...wrapToArray(next)];
-    });
-    return errors;
-};
-
 export const isPromise = object => typeof object === 'object' && typeof object.then === 'function' && typeof object.catch === 'function';

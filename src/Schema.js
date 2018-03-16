@@ -1,20 +1,18 @@
 import {
     pick,
-    clone,
     arraysDifference,
     getFieldType,
     getFieldDefaultValue,
     wrapToArray,
-    getFunctionName,
     removeFirstKeyIfNumber,
     getErrorIndexFromKeys,
-    mergeErrors,
     isPromise,
 } from './helpers';
 
 import OrOperator from './operators/OrOperator';
 import SchemaType from './SchemaType';
 import Field from './Field';
+import ValidationErrors from './ValidationErrors';
 
 import * as defaultErrorMessages from './defaultErrorMessages';
 
@@ -94,7 +92,7 @@ export default class Schema {
         this.errors = {};
         if (model) {
             this.handleModelKeysNotDefinedInSchema(model);
-            const promises = this.checkTypesAndValidators(model);
+            const promises = this.handleEveryFieldValidator(model);
             if (promises.length > 0) {
                 return Promise.all(promises).then(() => this.errors);
             }
@@ -107,7 +105,7 @@ export default class Schema {
     setError(key, error, index) {
         if (!this.errors[key]) this.errors[key] = [];
         if (index > -1) {
-            this.errors[key][index] = mergeErrors(this.errors[key][index], error);
+            this.errors[key][index] = ValidationErrors.mergeErrors(this.errors[key][index], error);
             return;
         }
         this.errors[key].push(error);
@@ -147,16 +145,21 @@ export default class Schema {
         });
     }
 
-    checkTypesAndValidators(model) {
+    handleEveryFieldValidator(model) {
         let promises = [];
         const schemaKeys = Object.keys(this.schema);
         const validatedObject = pick(model, schemaKeys);
+
         this.fields.forEach((field) => {
             const schema = this;
             const result = field.validate(validatedObject, schema);
-            this.errors = Object.assign(this.errors, field.errors);
+            if (field.hasErrors()) {
+                const errors = field.getErrors();
+                this.errors = Object.assign(this.errors, { [field.key]: errors });
+            }
             promises = promises.concat(result);
         });
+
         return promises.concat(this.validateAdditionalValidators(model));
     }
 

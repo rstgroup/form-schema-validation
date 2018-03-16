@@ -1,18 +1,9 @@
 import {
-    pick,
-    clone,
-    arraysDifference,
-    getFieldType,
-    getFieldDefaultValue,
-    wrapToArray,
     getFunctionName,
-    removeFirstKeyIfNumber,
-    getErrorIndexFromKeys,
-    mergeErrors,
-    isPromise,
 } from './helpers';
 
 import Schema from './Schema';
+import ValidationErrors from './ValidationErrors'
 
 import validateArray from './validators/array';
 import validateBoolean from './validators/boolean';
@@ -49,7 +40,7 @@ export default class Field {
         this.defaultValue = rawField.defaultValue;
         this.validators = rawField.validators;
         this.options = rawField.options;
-        this.errors = {};
+        this.validationErrors = new ValidationErrors();
         this.messages = { ...defaultErrorMessages, ...customErrorMessages };
 
         this.internal = {
@@ -115,12 +106,7 @@ export default class Field {
     }
 
     setError(key, error, index) {
-        if (!this.errors[key]) this.errors[key] = [];
-        if (index > -1) {
-            this.errors[key][index] = mergeErrors(this.errors[key][index], error);
-            return;
-        }
-        this.errors[key].push(error);
+        this.validationErrors.createError(error, index);
     }
 
     registerType(type) {
@@ -219,8 +205,16 @@ export default class Field {
         this.setError(key, this.messages.validateRequired(label || key));
     }
 
+    hasErrors() {
+        return this.validationErrors.hasErrors();
+    }
+
+    getErrors() {
+        return this.validationErrors.getErrors();
+    }
+
     clearErrors() {
-        this.errors = {};
+        this.validationErrors.clearErrors();
     }
 
     validate(model, schema) {
