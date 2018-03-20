@@ -38,7 +38,7 @@ export default class Field {
         this.required = rawField.required;
         this.label = rawField.label;
         this.defaultValue = rawField.defaultValue;
-        this.validators = rawField.validators;
+        this.validators = Array.isArray(rawField.validators) ? rawField.validators : [];
         this.options = rawField.options;
         this.validationErrors = new ValidationErrors();
         this.messages = { ...defaultErrorMessages, ...customErrorMessages };
@@ -173,6 +173,12 @@ export default class Field {
     getValues(model) {
         const value = model[this.key];
         return this.isArrayType() ? value : [value];
+    }
+
+    getFirstValue(model) {
+        const values = this.getValues(model);
+        const value = values[0];
+        return value;
     }
 
     handleTypeValidation(validate, createErrorMessage, value, key, index) {

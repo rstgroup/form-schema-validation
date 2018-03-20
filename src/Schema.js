@@ -158,22 +158,9 @@ export default class Schema {
     }
 
     handleAsyncFieldValidation(model) {
-        let promises = [];
-
-        this.fields.forEach((field) => {
-            const values = field.getValues(model);
-            const firstValue = values[0];
-            const result = this.validateCustomValidators({
-                validators: field.validators,
-                value: firstValue,
-                fieldSchema: field,
-                validatedObject: model,
-                key: field.key,
-            });
-            promises = promises.concat(result);
-        });
-
-        return promises;
+        return this.fields
+            .map(field => this.validateCustomValidators(field, model))
+            .filter(array => array.length);
     }
 
     handleEveryFieldValidator(model) {
@@ -198,33 +185,24 @@ export default class Schema {
         }
     }
 
-    validateCustomValidators({ validators, value, fieldSchema, validatedObject, key }) {
-        const promises = [];
-        if (Array.isArray(validators)) {
-            validators.forEach(({ validator, errorMessage }) => {
-                const results = validator(value, fieldSchema, validatedObject);
-                if (isPromise(results)) {
-                    const promise = results.then((result) => {
-                        this.resolveValidatorErrorsForKey(key, errorMessage, result);
-                    });
-                    promises.push(promise);
-                    return;
-                }
-                this.resolveValidatorErrorsForKey(key, errorMessage, results);
-            });
-        }
-        return promises;
+    validateCustomValidators(field, model) {
+        const value = field.getFirstValue(model);
+        return field.validators.map(({ validator, errorMessage }) => {
+            const validationResult = validator(value, field, model);
+            if (isPromise(validationResult)) {
+                return validationResult.then((result) => {
+                    this.resolveValidatorErrorsForKey(field.key, errorMessage, result);
+                    return result;
+                });
+            }
+            this.resolveValidatorErrorsForKey(field.key, errorMessage, validationResult);
+        }).filter(promise => promise);
     }
 
     validateAdditionalValidators(model) {
-        const promises = [];
-        this.additionalValidators.forEach((validator) => {
-            const results = validator(model, this);
-            if (isPromise(results)) {
-                promises.push(results);
-            }
-        });
-        return promises;
+        return Array.from(this.additionalValidators)
+            .map(validator => validator(model, this))
+            .filter(isPromise);
     }
 
     pick(fieldsToPick) {
@@ -247,9 +225,7 @@ export default class Schema {
     }
 
     extend(fieldsToExtend) {
-        Object.keys(fieldsToExtend).forEach((fieldName) => {
-            this.schema[fieldName] = fieldsToExtend[fieldName];
-        });
+        Object.assign(this.schema, fieldsToExtend);
     }
 
     registerType(type) {
