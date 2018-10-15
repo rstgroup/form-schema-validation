@@ -148,12 +148,16 @@ class Schema {
             this.errors[key] = [];
         }
 
+        const errorMessage = typeof error === 'function' ?
+            error() :
+            error;
+
         if (index > -1) {
-            this.errors[key][index] = mergeErrors(this.errors[key][index], error);
+            this.errors[key][index] = mergeErrors(this.errors[key][index], errorMessage);
             return;
         }
 
-        this.errors[key].push(error);
+        this.errors[key].push(errorMessage);
     }
 
     setModelError(path, message) {

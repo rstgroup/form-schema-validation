@@ -859,6 +859,7 @@ describe('Schema', () => {
             expect(Object.keys(modelWithNumberErrors).length).toBe(7);
         });
     });
+
     describe('Should validate using custom validators', () => {
         jest.useFakeTimers();
 
@@ -897,7 +898,6 @@ describe('Schema', () => {
             expect(Object.keys(testObjectErrors).length).toBe(0);
             expect(Object.keys(testObject2Errors).length).toBe(1);
         });
-
 
         it('async with promise (1 error)', () => {
             const asyncValidator = () => ({
@@ -989,6 +989,29 @@ describe('Schema', () => {
             });
             const results = schema.validate({ foo: 'foo' });
             expect(results.foo).toEqual([errorMessage]);
+        });
+
+        it('should allow to define a validator errorMessage as a function that will return an error diring validation', () => {
+            const customErrorMessage = 'error';
+            const customValidator = {
+                validator: () => false,
+                errorMessage: () => customErrorMessage,
+            };
+
+            const schema = new Schema({
+                property: {
+                    type: String,
+                    validators: [customValidator],
+                },
+            });
+
+            const testObject = {
+                property: 'value',
+            };
+
+            expect(schema.validate(testObject)).toEqual({
+                property: [customErrorMessage],
+            });
         });
     });
 
@@ -1522,6 +1545,7 @@ describe('Schema', () => {
             expect(schema.getDefaultValues()).toEqual({ foo: 'foo', bar: '' });
         });
     });
+
     describe('additionalValidators', () => {
         it('should add additional validator', () => {
             const fooValidator = jest.fn();
@@ -1530,6 +1554,7 @@ describe('Schema', () => {
             schema.addValidator(fooValidator);
             expect(schema.additionalValidators.size).toEqual(1);
         });
+
         it('should not add the validator if is not a function', () => {
             const fooValidator = 'foo';
             const schema = new Schema({});
@@ -1537,6 +1562,7 @@ describe('Schema', () => {
             schema.addValidator(fooValidator);
             expect(schema.additionalValidators.size).toEqual(0);
         });
+
         it('should remove additional validator', () => {
             const fooValidator = jest.fn();
             const schema = new Schema({});
@@ -1545,6 +1571,7 @@ describe('Schema', () => {
             schema.removeValidator(fooValidator);
             expect(schema.additionalValidators.size).toEqual(0);
         });
+
         it('should set error on field in first layer of model', () => {
             const modelSchema = new Schema({
                 foo: {
@@ -1562,6 +1589,7 @@ describe('Schema', () => {
 
             expect(modelSchema.validate(data)).toEqual({ foo: ['foo error message!'] });
         });
+
         it('should set error on field in second layer of model', () => {
             const fooSchema = new Schema({
                 fooStart: {
@@ -1592,6 +1620,7 @@ describe('Schema', () => {
                 ],
             });
         });
+
         it('should set error on field in third layer of model', () => {
             const fooBarSchema = new Schema({
                 bar1: {
@@ -1635,6 +1664,7 @@ describe('Schema', () => {
                 ],
             });
         });
+
         it('should set error on field in third layer of model in specific element in array', () => {
             const fooBarSchema = new Schema({
                 bar1: {
@@ -1685,6 +1715,7 @@ describe('Schema', () => {
                 ],
             });
         });
+
         it('should merge errors if error is set on the same key and index', () => {
             const unitSchema = new Schema({
                 value: {
@@ -1811,6 +1842,7 @@ describe('Schema', () => {
                 ],
             });
         });
+
         it('should set error on field (async validation)', () => {
             const fooSchema = new Schema({
                 fooStart: {
