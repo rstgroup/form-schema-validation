@@ -991,8 +991,8 @@ describe('Schema', () => {
             expect(results.foo).toEqual([errorMessage]);
         });
 
-        it('should allow to define a validator errorMessage as a function that will return an error diring validation', () => {
-            const customErrorMessage = 'error';
+        it('should allow to define a validator errorMessage as a function that will return an error during validation', () => {
+            const customErrorMessage = 'foo error';
             const customValidator = {
                 validator: () => false,
                 errorMessage: () => customErrorMessage,
