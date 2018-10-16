@@ -1,20 +1,20 @@
-var webpack = require('webpack');
-var path = require('path');
+const path = require('path');
 
 module.exports = {
-    entry: path.resolve(__dirname, "./src/index.js"),
+    mode: 'production',
+    entry: path.resolve(__dirname, './src/index.js'),
     output: {
-        path: path.resolve(__dirname, "./dist/"),
-        filename: "index.js",
-        libraryTarget: "umd"
+        path: path.resolve(__dirname, './dist/'),
+        filename: 'index.js',
+        libraryTarget: 'umd',
     },
     module: {
-        loaders: [
+        rules: [
             {
-                test: /.js?$/,
+                test: /.js$/,
                 loader: 'babel-loader',
-                exclude: /node_modules/
-            }
-        ]
-    }
+                exclude: /node_modules/,
+            },
+        ],
+    },
 };
