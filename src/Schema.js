@@ -29,6 +29,7 @@ class Schema {
     static oneOfTypes(types) {
         return new OneOfTypes(types);
     }
+
     static optionalType(type, uniqueTypeName = '') {
         const fieldType = getFieldType({ type });
         const { name = 'Type' } = fieldType;
@@ -148,9 +149,9 @@ class Schema {
             this.errors[key] = [];
         }
 
-        const errorMessage = typeof error === 'function' ?
-            error() :
-            error;
+        const errorMessage = typeof error === 'function'
+            ? error()
+            : error;
 
         if (index > -1) {
             this.errors[key][index] = mergeErrors(this.errors[key][index], errorMessage);
