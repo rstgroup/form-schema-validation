@@ -83,15 +83,14 @@ const isObjectWithoutProps = (obj) => {
         return true;
     }
 
-    return typeof obj === 'object' &&
-        !Array.isArray(obj) &&
-        Object.keys(obj).length === 0;
+    return typeof obj === 'object'
+        && !Array.isArray(obj)
+        && Object.keys(obj).length === 0;
 };
 
-const isArrayable = src =>
-    Array.isArray(src) ||
-    typeof src === 'string' ||
-    typeof src === 'undefined';
+const isArrayable = src => Array.isArray(src)
+    || typeof src === 'string'
+    || typeof src === 'undefined';
 
 const castAsArray = (src) => {
     if (src === null) {

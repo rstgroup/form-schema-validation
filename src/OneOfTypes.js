@@ -2,9 +2,11 @@ class OneOfTypes {
     constructor(types) {
         this.types = types;
     }
+
     getTypes() {
         return this.types || [];
     }
+
     parseValue(value) {
         const model = {};
         this.getTypes().forEach((type, key) => {
@@ -12,6 +14,7 @@ class OneOfTypes {
         });
         return model;
     }
+
     getSchema() {
         const schema = {};
         this.getTypes().forEach((type, key) => {
