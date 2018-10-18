@@ -29,6 +29,7 @@ class Schema {
     static oneOfTypes(types) {
         return new OneOfTypes(types);
     }
+
     static optionalType(type, uniqueTypeName = '') {
         const fieldType = getFieldType({ type });
         const { name = 'Type' } = fieldType;
