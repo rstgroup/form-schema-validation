@@ -2,7 +2,7 @@
     "env": {
         "jest": true
     },
-    "extends": ["airbnb"],
+    "extends": ["airbnb-base"],
     "rules": {
         "indent": [2, 4],
         "complexity": [2, { "max": 5 }],
