@@ -13,7 +13,7 @@
 1. [Types](#types)
 1. [Example of custom validator](#example-of-custom-validator)
 1. [Example of additional validator](#example-of-additional-validator)
-1. [Schema definition Example](#schema-definition-example)
+1. [Example of Schema definition](#example-of-schema-definition)
 1. [Example of schema in schema](#example-of-schema-in-schema)
 1. [Schema keys description](#schema-keys-description)
 1. [Custom validation messages](#custom-validation-messages)
@@ -112,12 +112,13 @@ results.then((errors) => {
 | setError | key: String, message: String, index: Number | Set error on field |
 | setModelError | path: String, message: String | Set error on model tree node |
 | getDefaultValues |  | Get default values for model using defined schema |
-| getField | name: String | Get field schema |
-| getField |  | Get all fields schemas |
+| getField | name: String | Get field properties extended by parent schema instance (`parentSchema`) |
+| getFields |  | Get all fields schemas |
 | oneOfTypes | types: Array of types | Give posibility to validate one of type (Static method) |
 | pick | fieldsToPick: [String] | Get fields from schema by keys |
 | omit | fieldsToOmit: [String] | Get fields from schema and omit fieldsToOmit |
 | extend | fieldsToExtend: [String] | Extend schema by new fields or overwrite them |
+| extendFieldValidators | fieldName: String, validator: { validator: Function, errorMessage: String or Function } | Extend field validators |
 | registerType | type: SchemaType | Register new schema type |
 | isValidatorRegistred | validatorName: String | Check model validator exists in schema |
 | addValidator | validatorName: String, validator: Function(model: Object, schema: instance of Schema) | Add model validator |
@@ -139,12 +140,21 @@ results.then((errors) => {
 | SchemaType | You can register new schema type that has name, validator, validator when field is required (requiredValidator) and getDefaultValue |
 | [OneOfTypesAbove] | This type check value is array of type |
 
+### Custom validator attributes
+
+| Name | Description |
+|---|---|
+| value | Field value |
+| field | Field properties |
+| model | Validated object |
+| schema | Field parent schema instance |
+
 #### Example of custom validator
 This validator will check two fields. You can validate one field on base another field.
 ```js
 const validateIfFieldTitleIsFilled = (minLength, message) => ({
-    validator: (value, fieldSchema, formData) => {
-        if(formData.title){
+    validator: (value, field, model, schema) => {
+        if (model.title) {
             return !!value;
         }
         return true;
@@ -202,7 +212,7 @@ const validateIfOfAge = () => ({
 });
 ```
 
-### Schema definition Example
+### Example of Schema definition
 
 If You want create new schema You must put object to constructor with information about object keys names and type of value on key.
 
