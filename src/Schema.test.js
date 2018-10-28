@@ -1013,6 +1013,123 @@ describe('Schema', () => {
                 property: [customErrorMessage],
             });
         });
+
+        describe('Should extend validators on field', () => {
+            it('when validators property not exist on field', () => {
+                const customErrorMessage = 'foo error';
+                const fooValidator = {
+                    validator: () => false,
+                    errorMessage: () => customErrorMessage,
+                };
+
+                const schema = new Schema({
+                    property: {
+                        type: String,
+                    },
+                });
+
+                schema.extendFieldValidators('property', fooValidator);
+
+                expect(schema.getFieldValidators('property')).toEqual([fooValidator]);
+            });
+
+            it('when validators property exist on field', () => {
+                const customErrorMessage = 'foo error';
+                const customValidator = {
+                    validator: () => false,
+                    errorMessage: () => customErrorMessage,
+                };
+
+                const fooValidator = {
+                    validator: () => false,
+                    errorMessage: () => customErrorMessage,
+                };
+
+                const schema = new Schema({
+                    property: {
+                        type: String,
+                        validators: [customValidator],
+                    },
+                });
+
+                schema.extendFieldValidators('property', fooValidator);
+
+                expect(schema.getFieldValidators('property')).toEqual([customValidator, fooValidator]);
+            });
+
+            it('when validators property exist on field and validator has id', () => {
+                const customErrorMessage = 'foo error';
+                const customValidator = {
+                    validator: () => false,
+                    errorMessage: () => customErrorMessage,
+                    id: 'customValidator',
+                };
+
+                const fooValidator = {
+                    validator: () => false,
+                    errorMessage: () => customErrorMessage,
+                    id: 'fooValidator',
+                };
+
+                const schema = new Schema({
+                    property: {
+                        type: String,
+                        validators: [customValidator],
+                    },
+                });
+
+                schema.extendFieldValidators('property', fooValidator);
+
+                expect(schema.getFieldValidators('property')).toEqual([customValidator, fooValidator]);
+            });
+        });
+        describe('Should not extend validators on field', () => {
+            it('when validator exist in validators property', () => {
+                const customErrorMessage = 'foo error';
+                const customValidator = {
+                    validator: () => false,
+                    errorMessage: () => customErrorMessage,
+                };
+
+                const schema = new Schema({
+                    property: {
+                        type: String,
+                        validators: [customValidator],
+                    },
+                });
+
+                schema.setFieldValidator = jest.fn();
+                schema.extendFieldValidators('property', customValidator);
+
+                expect(schema.setFieldValidator).not.toBeCalled();
+            });
+
+            it('when validator with the same id exist in validators property', () => {
+                const customErrorMessage = 'foo error';
+                const customValidator = {
+                    validator: () => false,
+                    errorMessage: () => customErrorMessage,
+                    id: 'customValidator',
+                };
+
+                const fooValidator = {
+                    validator: () => false,
+                    errorMessage: () => customErrorMessage,
+                    id: 'customValidator',
+                };
+
+                const schema = new Schema({
+                    property: {
+                        type: String,
+                        validators: [customValidator],
+                    },
+                });
+                schema.setFieldValidator = jest.fn();
+                schema.extendFieldValidators('property', fooValidator);
+
+                expect(schema.setFieldValidator).not.toBeCalled();
+            });
+        });
     });
 
     describe('Default value', () => {

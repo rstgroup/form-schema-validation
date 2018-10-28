@@ -123,7 +123,7 @@ class Schema {
     }
 
     getField(name) {
-        return this.schema[name];
+        return { ...this.schema[name], parentSchema: this };
     }
 
     getFields() {
@@ -202,6 +202,7 @@ class Schema {
         schemaKeys.forEach((key) => {
             const value = validatedObject[key];
             const fieldSchema = this.schema[key];
+            const validators = this.getFieldValidators(key);
             const isArrayOfType = Array.isArray(fieldSchema.type);
             const fieldType = isArrayOfType ? fieldSchema.type[0] : fieldSchema.type;
             if (isArrayOfType && this.validateType(Array, value)) {
@@ -213,7 +214,7 @@ class Schema {
             }
             this.validateRequired(fieldSchema, value, key);
             this.validateCustomValidators({
-                validators: fieldSchema.validators,
+                validators,
                 value,
                 fieldSchema,
                 validatedObject,
@@ -240,11 +241,8 @@ class Schema {
     }
 
     validateCustomValidators({ validators, value, fieldSchema, validatedObject, key }) {
-        if (!validators) {
-            return;
-        }
         validators.forEach(({ validator, errorMessage }) => {
-            const results = validator(value, fieldSchema, validatedObject);
+            const results = validator(value, fieldSchema, validatedObject, this);
             if (results instanceof Promise) {
                 const promise = results.then((result) => {
                     this.resolveValidatorErrorsForKey(key, errorMessage, result);
@@ -433,6 +431,35 @@ class Schema {
         Object.keys(fieldsToExtend).forEach((fieldName) => {
             this.schema[fieldName] = fieldsToExtend[fieldName];
         });
+    }
+
+    getFieldValidators(fieldName) {
+        return this.schema[fieldName].validators || [];
+    }
+
+    setFieldValidator(fieldName, validator) {
+        if (!Array.isArray(this.schema[fieldName].validators)) {
+            this.schema[fieldName].validators = [];
+        }
+        this.schema[fieldName].validators.push(validator);
+    }
+
+    extendFieldValidators(fieldName, validator) {
+        const validators = this.getFieldValidators(fieldName);
+        if (!validators.length) {
+            this.setFieldValidator(fieldName, validator);
+            return;
+        }
+        if (
+            validators.indexOf(validator) > -1 ||
+            (
+                validator.id &&
+                validators.findIndex(validatorItem => validatorItem.id === validator.id) > -1
+            )
+        ) {
+            return;
+        }
+        this.setFieldValidator(fieldName, validator);
     }
 
     registerTypeIfNotExists(type, typeName) {
