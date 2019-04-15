@@ -121,7 +121,7 @@ results.then((errors) => {
 | extendFieldValidators | fieldName: String, validator: { validator: Function, errorMessage: String or Function } | Extend field validators |
 | registerType | type: SchemaType | Register new schema type |
 | isValidatorRegistred | validatorName: String | Check model validator exists in schema |
-| addValidator | validatorName: String, validator: Function(model: Object, schema: instance of Schema) | Add model validator |
+| addValidator | validator: Function(model: Object, schema: instance of Schema) | Add model validator |
 | removeValidator | validatorName: String | Remove model validator |
 
 ### Types
@@ -187,7 +187,7 @@ const dataModel = {
     },
 };
 
-modelSchema.addValidator('fooValidator', (model, schema) => {
+modelSchema.addValidator((model, schema) => {
     if(model.foo.fooStart === 'start') {
         schema.setModelError('foo.fooStart', 'my foo error message');
     }
