@@ -122,7 +122,7 @@ results.then((errors) => {
 | registerType | type: SchemaType | Register new schema type |
 | isValidatorRegistred | validatorName: String | Check model validator exists in schema |
 | addValidator | validator: Function(model: Object, schema: instance of Schema) | Add model validator |
-| removeValidator | validatorName: String | Remove model validator |
+| removeValidator | validator: Function | Remove model validator |
 
 ### Types
 
