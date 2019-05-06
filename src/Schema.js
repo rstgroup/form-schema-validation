@@ -392,10 +392,18 @@ class Schema {
     }
 
     validateTypeSchema(value, subSchemaKey, type, index) {
-        const errors = type.validate(value);
-        const keys = Object.keys(errors);
+        const results = type.validate(value);
+        if (results instanceof Promise) {
+            const promise = results.then((errors) => {
+                const keys = Object.keys(errors);
+                if (keys.length > 0) this.setError(subSchemaKey, errors, index);
+            });
+            this.promises.push(promise);
+            return false;
+        }
+        const keys = Object.keys(results);
         if (keys.length === 0) return true;
-        this.setError(subSchemaKey, errors, index);
+        this.setError(subSchemaKey, results, index);
         return false;
     }
 

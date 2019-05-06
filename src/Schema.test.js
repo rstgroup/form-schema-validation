@@ -961,6 +961,87 @@ describe('Schema', () => {
             });
         });
 
+        it('async with promise in child schema (0 error)', () => {
+            const asyncValidator = () => ({
+                validator(value) {
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            resolve(value === 'test company2');
+                        }, 1000);
+                    });
+                },
+                errorMessage: 'async validation failed',
+            });
+
+            const companySchema = new Schema({
+                name: {
+                    type: String,
+                    required: true,
+                    validators: [asyncValidator()],
+                },
+            });
+
+            const schema = new Schema({
+                company: {
+                    type: companySchema,
+                    required: true,
+                },
+            });
+
+            const testObject = {
+                company: {
+                    name: 'test company2',
+                },
+            };
+
+            const testObjectErrors = schema.validate(testObject);
+            jest.runOnlyPendingTimers();
+            return testObjectErrors.then((results) => {
+                expect(Object.keys(results).length).toBe(0);
+            });
+        });
+
+
+        it('async with promise in child schema (1 error)', () => {
+            const asyncValidator = () => ({
+                validator(value) {
+                    return new Promise((resolve) => {
+                        setTimeout(() => {
+                            resolve(value === 'test company2');
+                        }, 1000);
+                    });
+                },
+                errorMessage: 'async validation failed',
+            });
+
+            const companySchema = new Schema({
+                name: {
+                    type: String,
+                    required: true,
+                    validators: [asyncValidator()],
+                },
+            });
+
+            const schema = new Schema({
+                company: {
+                    type: companySchema,
+                    required: true,
+                },
+            });
+
+            const testObject = {
+                company: {
+                    name: 'test company',
+                },
+            };
+
+            const testObjectErrors = schema.validate(testObject);
+            jest.runOnlyPendingTimers();
+            return testObjectErrors.then((results) => {
+                expect(Object.keys(results).length).toBe(1);
+            });
+        });
+
         it('should be able to return multiple errorMessages in an array from validator', () => {
             const errorMessages = ['bar', 'biz'];
             const validatorObject = {
