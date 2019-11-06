@@ -29,6 +29,7 @@ class Schema {
     static oneOfTypes(types) {
         return new OneOfTypes(types);
     }
+
     static optionalType(type, uniqueTypeName = '') {
         const fieldType = getFieldType({ type });
         const { name = 'Type' } = fieldType;
@@ -148,9 +149,9 @@ class Schema {
             this.errors[key] = [];
         }
 
-        const errorMessage = typeof error === 'function' ?
-            error() :
-            error;
+        const errorMessage = typeof error === 'function'
+            ? error()
+            : error;
 
         if (index > -1) {
             this.errors[key][index] = mergeErrors(this.errors[key][index], errorMessage);
@@ -167,7 +168,7 @@ class Schema {
         const errorIndex = getErrorIndexFromKeys(keys);
         const field = this.getField(firstKey);
         const fieldType = getFieldType(field);
-        if (fieldType instanceof Schema) {
+        if (fieldType instanceof Schema && keys.length > 0) {
             const virtualSchema = new Schema(fieldType.schema);
             const childPath = removeFirstKeyIfNumber(keys).join('.');
             virtualSchema.setModelError(childPath, message);
@@ -459,10 +460,10 @@ class Schema {
             return;
         }
         if (
-            validators.indexOf(validator) > -1 ||
-            (
-                validator.id &&
-                validators.findIndex(validatorItem => validatorItem.id === validator.id) > -1
+            validators.indexOf(validator) > -1
+            || (
+                validator.id
+                && validators.findIndex(validatorItem => validatorItem.id === validator.id) > -1
             )
         ) {
             return;
