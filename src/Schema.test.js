@@ -1784,6 +1784,37 @@ describe('Schema', () => {
             });
         });
 
+        it('should set error on field in second layer of model by error as object', () => {
+            const fooSchema = new Schema({
+                fooStart: {
+                    type: String,
+                },
+            });
+            const modelSchema = new Schema({
+                foo: {
+                    type: fooSchema,
+                    required: true,
+                },
+            });
+            const data = {
+                foo: {
+                    fooStart: 'start',
+                },
+            };
+
+            modelSchema.addValidator((model, schema) => {
+                schema.setModelError('foo', { fooStart: ['foo error message!'] });
+            });
+
+            expect(modelSchema.validate(data)).toEqual({
+                foo: [
+                    {
+                        fooStart: ['foo error message!'],
+                    },
+                ],
+            });
+        });
+
         it('should set error on field in third layer of model', () => {
             const fooBarSchema = new Schema({
                 bar1: {
