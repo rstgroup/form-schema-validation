@@ -5,7 +5,7 @@
     "extends": ["airbnb-base"],
     "rules": {
         "indent": [2, 4],
-        "complexity": [2, { "max": 5 }],
+        "complexity": [2, { "max": 7 }],
         "no-use-before-define": [2, {
             "functions": false,
             "classes": false,

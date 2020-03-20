@@ -92,6 +92,11 @@ const isArrayable = src => Array.isArray(src)
     || typeof src === 'string'
     || typeof src === 'undefined';
 
+export const isArrayOfStringsOrString = src => (
+    (Array.isArray(src) && src.filter(element => typeof element === 'string').length === src.length)
+    || typeof src === 'string'
+);
+
 const castAsArray = (src) => {
     if (src === null) {
         return [];
@@ -122,6 +127,12 @@ const mergeErrorsLists = (a, b) => {
     return merged;
 };
 
+export const mergeArraysOfStrings = (a, b) => {
+    const parsedA = Array.isArray(a) ? [...a] : [a];
+    const parsedB = Array.isArray(b) ? [...b] : [b];
+    return [...parsedA, ...parsedB];
+};
+
 const mergeObjectsErrors = (currentErrors, nextErrors) => {
     const errors = {};
     const errorKeys = new Set();
@@ -145,6 +156,10 @@ const mergeObjectsErrors = (currentErrors, nextErrors) => {
 export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
     if (isObjectWithoutProps(currentErrors) && isObjectWithoutProps(nextErrors)) {
         return {};
+    }
+
+    if (isArrayOfStringsOrString(currentErrors) && isArrayOfStringsOrString(nextErrors)) {
+        return mergeArraysOfStrings(currentErrors, nextErrors);
     }
 
     if (isArrayable(currentErrors) || isArrayable(nextErrors)) {

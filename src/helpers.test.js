@@ -10,6 +10,8 @@ import {
     removeFirstKeyIfNumber,
     getErrorIndexFromKeys,
     mergeErrors,
+    mergeArraysOfStrings,
+    isArrayOfStringsOrString,
 } from './helpers';
 
 describe('helpers', () => {
@@ -228,6 +230,37 @@ describe('helpers', () => {
             expect(getErrorIndexFromKeys(keys)).toEqual(-1);
         });
     });
+    describe('mergeArraysOfStrings', () => {
+        it('should merge string with array of strings', () => {
+            expect(mergeArraysOfStrings('test', ['test2'])).toEqual(['test', 'test2']);
+        });
+        it('should merge array of strings with string', () => {
+            expect(mergeArraysOfStrings(['test2'], 'test')).toEqual(['test2', 'test']);
+        });
+        it('should merge array of strings with array of strings', () => {
+            expect(mergeArraysOfStrings(['test2'], ['test'])).toEqual(['test2', 'test']);
+        });
+    });
+    describe('isArrayOfStringsOrString', () => {
+        it('should return true when value is array of strings', () => {
+            expect(isArrayOfStringsOrString(['test'])).toEqual(true);
+        });
+        it('should return true when value is string', () => {
+            expect(isArrayOfStringsOrString('test')).toEqual(true);
+        });
+        it('should return false when value is not array of strings or string', () => {
+            expect(isArrayOfStringsOrString(undefined)).toEqual(false);
+            expect(isArrayOfStringsOrString(null)).toEqual(false);
+            expect(isArrayOfStringsOrString({})).toEqual(false);
+            expect(isArrayOfStringsOrString(123)).toEqual(false);
+            expect(isArrayOfStringsOrString(NaN)).toEqual(false);
+            expect(isArrayOfStringsOrString([undefined, 'test'])).toEqual(false);
+            expect(isArrayOfStringsOrString([null])).toEqual(false);
+            expect(isArrayOfStringsOrString([{}])).toEqual(false);
+            expect(isArrayOfStringsOrString([123])).toEqual(false);
+            expect(isArrayOfStringsOrString([NaN])).toEqual(false);
+        });
+    });
     describe('mergeErrors', () => {
         it('should merge objects with props as arrays of errors', () => {
             const currentErrors = {
@@ -253,7 +286,7 @@ describe('helpers', () => {
             };
             const expected = {
                 foo: ['foo 1', 'foo 2'],
-                bar: ['bar 1', 'bar 2'],
+                bar: ['bar 3', 'bar 1', 'bar 2'],
             };
 
             expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
@@ -306,10 +339,10 @@ describe('helpers', () => {
 
             expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
         });
-        it('should return an array with errors if next error is string and current is an array', () => {
+        it('should extend current errors if next error is string and current is an array', () => {
             const currentErrors = ['foo'];
             const nextErrors = 'bar';
-            const expected = ['bar'];
+            const expected = ['foo', 'bar'];
 
             expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
         });
