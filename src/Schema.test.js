@@ -1001,7 +1001,6 @@ describe('Schema', () => {
             });
         });
 
-
         it('async with promise in child schema (1 error)', () => {
             const asyncValidator = () => ({
                 validator(value) {

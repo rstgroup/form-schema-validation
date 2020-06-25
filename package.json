@@ -1,9 +1,10 @@
 {
   "name": "form-schema-validation",
-  "version": "1.17.4",
+  "version": "1.17.5",
   "description": "Schema for form validation",
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
+  "files": ["dist"],
   "repository": "https://github.com/rstgroup/form-schema-validation",
   "homepage": "https://github.com/rstgroup/form-schema-validation",
   "license": "MIT",
