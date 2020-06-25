@@ -463,7 +463,7 @@ class Schema {
             validators.indexOf(validator) > -1
             || (
                 validator.id
-                && validators.findIndex(validatorItem => validatorItem.id === validator.id) > -1
+                && validators.findIndex((validatorItem) => validatorItem.id === validator.id) > -1
             )
         ) {
             return;

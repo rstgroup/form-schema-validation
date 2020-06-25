@@ -60,7 +60,7 @@ export const getFunctionName = (type) => {
 };
 
 // eslint-disable-next-line no-self-compare
-export const isNaN = value => typeof value === 'number' && value !== value;
+export const isNaN = (value) => typeof value === 'number' && value !== value;
 
 export const removeFirstKeyIfNumber = (keys) => {
     const firstKey = parseInt(keys[0], 10);
@@ -88,12 +88,12 @@ const isObjectWithoutProps = (obj) => {
         && Object.keys(obj).length === 0;
 };
 
-const isArrayable = src => Array.isArray(src)
+const isArrayable = (src) => Array.isArray(src)
     || typeof src === 'string'
     || typeof src === 'undefined';
 
-export const isArrayOfStringsOrString = src => (
-    (Array.isArray(src) && src.filter(element => typeof element === 'string').length === src.length)
+export const isArrayOfStringsOrString = (src) => (
+    (Array.isArray(src) && src.filter((element) => typeof element === 'string').length === src.length)
     || typeof src === 'string'
 );
 
@@ -138,10 +138,10 @@ const mergeObjectsErrors = (currentErrors, nextErrors) => {
     const errorKeys = new Set();
 
     if (!isObjectWithoutProps(currentErrors)) {
-        Object.keys(currentErrors).forEach(key => errorKeys.add(key));
+        Object.keys(currentErrors).forEach((key) => errorKeys.add(key));
     }
     if (!isObjectWithoutProps(nextErrors)) {
-        Object.keys(nextErrors).forEach(key => errorKeys.add(key));
+        Object.keys(nextErrors).forEach((key) => errorKeys.add(key));
     }
 
     errorKeys.forEach((key) => {

@@ -5,8 +5,8 @@ describe('SchemaType', () => {
     beforeEach(() => {
         fooType = new SchemaType('foo', {
             getDefaultValue: () => 'foo',
-            validator: value => value.indexOf('foo') > -1 || '',
-            requiredValidator: value => value.indexOf('foo') > -1,
+            validator: (value) => value.indexOf('foo') > -1 || '',
+            requiredValidator: (value) => value.indexOf('foo') > -1,
         });
     });
 

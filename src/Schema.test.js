@@ -864,13 +864,13 @@ describe('Schema', () => {
         jest.useFakeTimers();
 
         it('sync', () => {
-            const minLength = length => ({
+            const minLength = (length) => ({
                 validator(value) {
                     return value.length >= length;
                 },
                 errorMessage: `Min length ${length}`,
             });
-            const maxLength = length => ({
+            const maxLength = (length) => ({
                 validator(value) {
                     return value.length <= length;
                 },
@@ -1000,7 +1000,6 @@ describe('Schema', () => {
                 expect(Object.keys(results).length).toBe(0);
             });
         });
-
 
         it('async with promise in child schema (1 error)', () => {
             const asyncValidator = () => ({
