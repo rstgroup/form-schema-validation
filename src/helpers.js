@@ -116,7 +116,7 @@ const castAsArray = (src) => {
 const mergeErrorsLists = (a, b) => {
     const merged = [];
     const maxLength = Math.max(a.length, b.length);
-
+    console.log(a, b);
     for (let i = 0; i < maxLength; i += 1) {
         const value = b[i] || a[i];
         if (value && !isObjectWithoutProps(value)) {
@@ -130,6 +130,8 @@ const mergeErrorsLists = (a, b) => {
 export const mergeArraysOfStrings = (a, b) => {
     const parsedA = Array.isArray(a) ? [...a] : [a];
     const parsedB = Array.isArray(b) ? [...b] : [b];
+    console.log('parsedA --->', parsedA);
+    console.log('parsedB --->', parsedB);
     return [...parsedA, ...parsedB];
 };
 
@@ -154,15 +156,19 @@ const mergeObjectsErrors = (currentErrors, nextErrors) => {
 };
 
 export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
+    console.log('mergeErrors --->', currentErrors, nextErrors);
     if (isObjectWithoutProps(currentErrors) && isObjectWithoutProps(nextErrors)) {
+        console.log('isObjectWithoutProps');
         return {};
     }
 
     if (isArrayOfStringsOrString(currentErrors) && isArrayOfStringsOrString(nextErrors)) {
+        console.log('isArrayOfStringsOrString');
         return mergeArraysOfStrings(currentErrors, nextErrors);
     }
 
     if (isArrayable(currentErrors) || isArrayable(nextErrors)) {
+        console.log('isArrayable');
         return mergeErrorsLists(castAsArray(currentErrors), castAsArray(nextErrors));
     }
 

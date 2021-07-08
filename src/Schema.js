@@ -158,6 +158,11 @@ class Schema {
             return;
         }
 
+        if (typeof error === 'object' && this.errors[key] && this.errors[key].length) {
+            this.errors[key][0] = mergeErrors(this.errors[key][0], errorMessage);
+            return;
+        }
+
         this.errors[key].push(errorMessage);
     }
 
