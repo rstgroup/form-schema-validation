@@ -88,6 +88,12 @@ const isObjectWithoutProps = (obj) => {
         && Object.keys(obj).length === 0;
 };
 
+const isObject = obj => (
+    typeof obj === 'object'
+    && !Array.isArray(obj)
+    && obj !== null
+);
+
 const isArrayable = src => Array.isArray(src)
     || typeof src === 'string'
     || typeof src === 'undefined';
@@ -116,9 +122,15 @@ const castAsArray = (src) => {
 const mergeErrorsLists = (a, b) => {
     const merged = [];
     const maxLength = Math.max(a.length, b.length);
-
     for (let i = 0; i < maxLength; i += 1) {
-        const value = b[i] || a[i];
+        let value;
+        const currentErrors = a[i];
+        const nextErrors = b[i];
+        if (isObject(currentErrors) && isObject(nextErrors)) {
+            value = { ...currentErrors, ...nextErrors };
+        } else {
+            value = b[i] || a[i];
+        }
         if (value && !isObjectWithoutProps(value)) {
             merged[i] = value;
         }

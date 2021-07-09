@@ -1938,102 +1938,111 @@ describe('Schema', () => {
                     type: unitSchema,
                 },
             });
-            const modelSchema = new Schema({
+            const elementsSchema = new Schema({
                 elements: {
                     type: [elementSchema],
                 },
             });
+            const modelSchema = new Schema({
+                test: {
+                    type: elementsSchema,
+                },
+            });
             const data = {
-                elements: [
-                    {
-                        name: 'test',
-                        type: 'pallet',
-                        height: {
-                            value: '10',
-                            unit: 'm',
+                test: {
+                    elements: [
+                        {
+                            name: 'test',
+                            type: 'pallet',
+                            height: {
+                                value: '10',
+                                unit: 'm',
+                            },
+                            weight: {
+                                value: '10',
+                                unit: 'm',
+                            },
+                            length: {
+                                value: '10',
+                                unit: 'm',
+                            },
                         },
-                        weight: {
-                            value: '10',
-                            unit: 'm',
+                        {
+                            name: 'test',
+                            type: 'pallet',
+                            height: {
+                                value: '',
+                                unit: 'm',
+                            },
+                            weight: {
+                                value: '10',
+                                unit: 'm',
+                            },
+                            length: {
+                                value: '10',
+                                unit: 'm',
+                            },
                         },
-                        length: {
-                            value: '10',
-                            unit: 'm',
+                        {
+                            name: 'test1',
+                            type: 'pallet',
+                            height: {
+                                value: '',
+                                unit: 'm',
+                            },
+                            weight: {
+                                value: '',
+                                unit: 'm',
+                            },
+                            length: {
+                                value: '10',
+                                unit: 'm',
+                            },
                         },
-                    },
-                    {
-                        name: 'test',
-                        type: 'pallet',
-                        height: {
-                            value: '',
-                            unit: 'm',
-                        },
-                        weight: {
-                            value: '10',
-                            unit: 'm',
-                        },
-                        length: {
-                            value: '10',
-                            unit: 'm',
-                        },
-                    },
-                    {
-                        name: 'test1',
-                        type: 'pallet',
-                        height: {
-                            value: '',
-                            unit: 'm',
-                        },
-                        weight: {
-                            value: '',
-                            unit: 'm',
-                        },
-                        length: {
-                            value: '10',
-                            unit: 'm',
-                        },
-                    },
-                ],
+                    ],
+                },
             };
 
             modelSchema.addValidator((model, schema) => {
-                if (!model || !Array.isArray(model.elements)) return;
+                if (!model || !Array.isArray(model.test.elements)) return;
                 const uniqueNames = new Set();
                 const errorMsg = 'duplicatedKey';
 
-                model.elements.forEach((element, index) => {
+                model.test.elements.forEach((element, index) => {
                     if (uniqueNames.has(element.name)) {
-                        schema.setModelError(`elements.${index}.name`, errorMsg);
+                        schema.setModelError(`test.elements.${index}.name`, errorMsg);
+                        schema.setModelError(`test.elements.${index}.name`, errorMsg);
                     } else {
                         uniqueNames.add(element.name);
                     }
                 });
             });
-
             expect(modelSchema.validate(data)).toEqual({
-                elements: [
-                    undefined,
-                    {
-                        name: ['duplicatedKey'],
-                        height: [
-                            {
-                                value: ["Field 'value' is required"],
-                            },
-                        ],
-                    },
-                    {
-                        height: [
-                            {
-                                value: ["Field 'value' is required"],
-                            },
-                        ],
-                        weight: [
-                            {
-                                value: ["Field 'value' is required"],
-                            },
-                        ],
-                    },
-                ],
+                test: [{
+                    elements: [
+                        undefined,
+                        {
+                            name: ['duplicatedKey'],
+                            height: [
+                                {
+                                    value: ["Field 'value' is required"],
+                                },
+                            ],
+                        },
+                        {
+                            height: [
+                                {
+                                    value: ["Field 'value' is required"],
+                                },
+                            ],
+                            weight: [
+                                {
+                                    value: ["Field 'value' is required"],
+                                },
+                            ],
+                        },
+                    ],
+                }],
             });
         });
 
