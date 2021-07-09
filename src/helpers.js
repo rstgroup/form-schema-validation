@@ -88,6 +88,12 @@ const isObjectWithoutProps = (obj) => {
         && Object.keys(obj).length === 0;
 };
 
+const isObject = obj => (
+    typeof obj === 'object'
+    && !Array.isArray(obj)
+    && obj !== null
+);
+
 const isArrayable = src => Array.isArray(src)
     || typeof src === 'string'
     || typeof src === 'undefined';
@@ -116,9 +122,15 @@ const castAsArray = (src) => {
 const mergeErrorsLists = (a, b) => {
     const merged = [];
     const maxLength = Math.max(a.length, b.length);
-    console.log(a, b);
     for (let i = 0; i < maxLength; i += 1) {
-        const value = b[i] || a[i];
+        let value;
+        const currentErrors = a[i];
+        const nextErrors = b[i];
+        if (isObject(currentErrors) && isObject(nextErrors)) {
+            value = { ...currentErrors, ...nextErrors };
+        } else {
+            value = b[i] || a[i];
+        }
         if (value && !isObjectWithoutProps(value)) {
             merged[i] = value;
         }
@@ -130,8 +142,6 @@ const mergeErrorsLists = (a, b) => {
 export const mergeArraysOfStrings = (a, b) => {
     const parsedA = Array.isArray(a) ? [...a] : [a];
     const parsedB = Array.isArray(b) ? [...b] : [b];
-    console.log('parsedA --->', parsedA);
-    console.log('parsedB --->', parsedB);
     return [...parsedA, ...parsedB];
 };
 
@@ -156,19 +166,15 @@ const mergeObjectsErrors = (currentErrors, nextErrors) => {
 };
 
 export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
-    console.log('mergeErrors --->', currentErrors, nextErrors);
     if (isObjectWithoutProps(currentErrors) && isObjectWithoutProps(nextErrors)) {
-        console.log('isObjectWithoutProps');
         return {};
     }
 
     if (isArrayOfStringsOrString(currentErrors) && isArrayOfStringsOrString(nextErrors)) {
-        console.log('isArrayOfStringsOrString');
         return mergeArraysOfStrings(currentErrors, nextErrors);
     }
 
     if (isArrayable(currentErrors) || isArrayable(nextErrors)) {
-        console.log('isArrayable');
         return mergeErrorsLists(castAsArray(currentErrors), castAsArray(nextErrors));
     }
 

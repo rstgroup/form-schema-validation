@@ -1910,7 +1910,7 @@ describe('Schema', () => {
             });
         });
 
-        xit('should merge errors if error is set on the same key and index', () => {
+        it('should merge errors if error is set on the same key and index', () => {
             const unitSchema = new Schema({
                 value: {
                     type: String,
@@ -2017,13 +2017,12 @@ describe('Schema', () => {
                     }
                 });
             });
-            console.log(modelSchema.validate(data));
             expect(modelSchema.validate(data)).toEqual({
                 test: [{
                     elements: [
                         undefined,
                         {
-                            name: ['duplicatedKey', 'duplicatedKey'],
+                            name: ['duplicatedKey'],
                             height: [
                                 {
                                     value: ["Field 'value' is required"],
