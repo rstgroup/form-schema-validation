@@ -148,7 +148,6 @@ class Schema {
         if (!this.errors[key]) {
             this.errors[key] = [];
         }
-
         const errorMessage = typeof error === 'function'
             ? error()
             : error;

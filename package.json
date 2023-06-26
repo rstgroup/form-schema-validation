@@ -1,6 +1,6 @@
 {
   "name": "form-schema-validation",
-  "version": "1.17.5",
+  "version": "2.0.0",
   "description": "Schema for form validation",
   "main": "dist/index.js",
   "jsnext:main": "src/index.js",
@@ -10,7 +10,7 @@
   "scripts": {
     "test": "jest && npm run lint",
     "test:watch": "jest --watch",
-    "build": "rm -rf ./dist && webpack -p --config webpack.config.js",
+    "build": "export SET NODE_OPTIONS=--openssl-legacy-provider && rm -rf ./dist && webpack -p --config webpack.config.js",
     "prepublish": "npm run test && npm run build",
     "coverage": "jest --coverage",
     "coverage:report": "cat ./coverage/lcov.info | coveralls",

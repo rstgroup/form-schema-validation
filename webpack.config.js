@@ -1,12 +1,12 @@
-var webpack = require('webpack');
-var path = require('path');
+const webpack = require('webpack');
+const path = require('path');
 
 module.exports = {
-    entry: path.resolve(__dirname, "./src/index.js"),
+    entry: path.resolve(__dirname, './src/index.js'),
     output: {
-        path: path.resolve(__dirname, "./dist/"),
-        filename: "index.js",
-        libraryTarget: "umd"
+        path: path.resolve(__dirname, './dist/'),
+        filename: 'index.js',
+        libraryTarget: 'umd',
     },
     module: {
         rules: [
@@ -16,10 +16,10 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['@babel/preset-env']
-                    }
-                }
-            }
-        ]
-    }
+                        presets: ['@babel/preset-env'],
+                    },
+                },
+            },
+        ],
+    },
 };

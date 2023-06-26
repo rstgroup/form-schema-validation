@@ -2022,7 +2022,7 @@ describe('Schema', () => {
                     elements: [
                         undefined,
                         {
-                            name: ['duplicatedKey'],
+                            name: ['duplicatedKey', 'duplicatedKey'],
                             height: [
                                 {
                                     value: ["Field 'value' is required"],
@@ -2038,6 +2038,64 @@ describe('Schema', () => {
                             weight: [
                                 {
                                     value: ["Field 'value' is required"],
+                                },
+                            ],
+                        },
+                    ],
+                }],
+            });
+        });
+
+        it('should merge errors if error is set on the same key', () => {
+            const citySchema = new Schema({
+                name: {
+                    type: String,
+                    required: true,
+                },
+                id: {
+                    type: Number,
+                    required: true,
+                },
+            });
+            const addressSchema = new Schema({
+                city: {
+                    type: citySchema,
+                },
+            });
+            const userSchema = new Schema({
+                address: {
+                    type: addressSchema,
+                },
+            });
+            const modelSchema = new Schema({
+                user: {
+                    type: userSchema,
+                },
+            });
+            const data = {
+                user: {
+                    address: {
+                        city: {
+                            name: '',
+                            id: 1,
+                        },
+                    },
+                },
+            };
+
+            modelSchema.addValidator((model, schema) => {
+                const errorMsg = 'duplicatedKey';
+
+                schema.setModelError('user.address.city.name', errorMsg);
+                schema.setModelError('user.address.city.name', `${errorMsg}1`);
+            });
+            expect(modelSchema.validate(data)).toEqual({
+                user: [{
+                    address: [
+                        {
+                            city: [
+                                {
+                                    name: ["Field 'name' is required", 'duplicatedKey', 'duplicatedKey1'],
                                 },
                             ],
                         },

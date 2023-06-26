@@ -127,7 +127,7 @@ const mergeErrorsLists = (a, b) => {
         const currentErrors = a[i];
         const nextErrors = b[i];
         if (isObject(currentErrors) && isObject(nextErrors)) {
-            value = { ...currentErrors, ...nextErrors };
+            value = mergeErrors(currentErrors, nextErrors);
         } else {
             value = b[i] || a[i];
         }
@@ -161,7 +161,6 @@ const mergeObjectsErrors = (currentErrors, nextErrors) => {
         const next = nextErrors[key] || [];
         errors[key] = mergeErrors(current, next);
     });
-
     return errors;
 };
 
