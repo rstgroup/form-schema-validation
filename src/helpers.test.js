@@ -379,7 +379,7 @@ describe('helpers', () => {
                 foo: ['foo 1'],
             }];
             const nextErrors = { foo: 'foo 2' };
-            const expected = [{ foo: 'foo 2' }];
+            const expected = [{ foo: ['foo 1', 'foo 2'] }];
 
             expect(mergeErrors(currentErrors, nextErrors)).toEqual(expected);
         });
