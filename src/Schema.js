@@ -9,7 +9,8 @@ import {
     removeFirstKeyIfNumber,
     getErrorIndexFromKeys,
     mergeErrors,
-    isSchema, isSchemaType,
+    isSchema,
+    isSchemaType,
 } from './helpers';
 import OneOfTypes from './OneOfTypes';
 import SchemaType from './SchemaType';
