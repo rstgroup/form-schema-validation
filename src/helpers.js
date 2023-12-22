@@ -179,3 +179,35 @@ export const mergeErrors = (currentErrors = {}, nextErrors = {}) => {
 
     return mergeObjectsErrors(currentErrors, nextErrors);
 };
+
+// eslint-disable-next-line complexity
+export const isSchema = (value, Schema) => {
+    if (value instanceof Schema) {
+        return true;
+    }
+
+    return (
+        typeof value === 'object'
+        && value !== null
+        && typeof value.schema === 'object'
+        && typeof value.validate === 'function'
+        && typeof value.getDefaultValues === 'function'
+        && typeof value.setModelError === 'function'
+        && typeof value.addValidator === 'function'
+        && typeof value.removeValidator === 'function'
+    );
+};
+
+export const isSchemaType = (value, SchemaType) => {
+    if (value instanceof SchemaType) {
+        return true;
+    }
+
+    return (
+        typeof value === 'object'
+        && value !== null
+        && typeof value.getDefaultValue === 'function'
+        && typeof value.validator === 'function'
+        && typeof value.requiredValidator === 'function'
+    );
+};
