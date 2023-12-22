@@ -9,6 +9,7 @@ import {
     removeFirstKeyIfNumber,
     getErrorIndexFromKeys,
     mergeErrors,
+    isSchema, isSchemaType,
 } from './helpers';
 import OneOfTypes from './OneOfTypes';
 import SchemaType from './SchemaType';
@@ -111,7 +112,7 @@ class Schema {
                 );
                 return;
             }
-            if (fieldType instanceof Schema) {
+            if (isSchema(fieldType, Schema)) {
                 model[key] = wrapToArray(
                     fieldType.getDefaultValues(),
                     isArrayOfType,
@@ -172,7 +173,7 @@ class Schema {
         const errorIndex = getErrorIndexFromKeys(keys);
         const field = this.getField(firstKey);
         const fieldType = getFieldType(field);
-        if (fieldType instanceof Schema && keys.length > 0) {
+        if (isSchema(fieldType, Schema) && keys.length > 0) {
             const virtualSchema = new Schema(fieldType.schema);
             const childPath = removeFirstKeyIfNumber(keys).join('.');
             virtualSchema.setModelError(childPath, message);
@@ -275,7 +276,7 @@ class Schema {
                 this.typesRequiredValidators[name](value, key);
                 return;
             }
-            if (fieldSchema.type instanceof Schema) {
+            if (isSchema(fieldSchema.type, Schema)) {
                 this.validateRequiredTypeSchema(fieldSchema.type.schema, value, key);
                 return;
             }
@@ -345,7 +346,7 @@ class Schema {
         if (typeof this.typesValidators[typeName] === 'function') {
             return this.typesValidators[typeName](value, key, type, index);
         }
-        if (type instanceof Schema) {
+        if (isSchema(type, Schema)) {
             return this.validateTypeSchema(value, key, type, index);
         }
         if (type instanceof OneOfTypes) {
@@ -476,7 +477,7 @@ class Schema {
     }
 
     registerTypeIfNotExists(type, typeName) {
-        if (type instanceof SchemaType && typeof this.typesValidators[typeName] !== 'function') {
+        if (isSchemaType(type, SchemaType) && typeof this.typesValidators[typeName] !== 'function') {
             this.registerType(type);
         }
     }
